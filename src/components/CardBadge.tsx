@@ -31,10 +31,11 @@ interface CardBadgeProps {
 
 export function CardBadge({ card, onClick, active, size = 'md', fluid }: CardBadgeProps) {
   const sizeClasses = fluid
-    ? 'flex-1 min-w-0 h-14 text-base'
+    ? 'flex-1 min-w-0 max-w-24 aspect-[5/7] text-lg sm:text-2xl'
     : size === 'md'
       ? 'w-10 h-14 text-base sm:w-11 sm:h-15'
       : 'w-8 h-11 text-sm';
+  const suitClasses = fluid ? 'text-sm sm:text-lg' : 'text-xs';
 
   if (card === null) {
     return (
@@ -64,7 +65,7 @@ export function CardBadge({ card, onClick, active, size = 'md', fluid }: CardBad
         border-zinc-300 dark:border-zinc-600 ${meta.text} ${onClick ? 'hover:shadow' : 'cursor-default'}`}
     >
       <span>{RANKS[rankOf(card)]}</span>
-      <span className="text-xs">{meta.symbol}</span>
+      <span className={suitClasses}>{meta.symbol}</span>
     </button>
   );
 }
