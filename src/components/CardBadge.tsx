@@ -25,11 +25,14 @@ interface CardBadgeProps {
   /** Highlight ring when this slot is the picker target. */
   active?: boolean;
   size?: 'sm' | 'md';
+  /** Stretch to share the row's width equally (board rows). */
+  fluid?: boolean;
 }
 
-export function CardBadge({ card, onClick, active, size = 'md' }: CardBadgeProps) {
-  const sizeClasses =
-    size === 'md'
+export function CardBadge({ card, onClick, active, size = 'md', fluid }: CardBadgeProps) {
+  const sizeClasses = fluid
+    ? 'flex-1 min-w-0 h-14 text-base'
+    : size === 'md'
       ? 'w-10 h-14 text-base sm:w-11 sm:h-15'
       : 'w-8 h-11 text-sm';
 

@@ -236,9 +236,8 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 pb-24">
       <main className="max-w-3xl mx-auto px-3 py-4 flex flex-col gap-4">
-        <header className="flex items-baseline justify-between">
+        <header>
           <h1 className="text-lg font-bold">PLO Bomb Pot Trainer</h1>
-          <span className="text-xs text-zinc-500">Phase 1 sandbox</span>
         </header>
 
         {/* Table setup */}
@@ -329,11 +328,12 @@ export default function Home() {
               <span className="w-14 text-xs font-medium text-emerald-200 shrink-0">
                 Board {b + 1}
               </span>
-              <div className="flex gap-1.5">
+              <div className="flex gap-1.5 flex-1">
                 {boards[b].map((card, i) => (
                   <CardBadge
                     key={i}
                     card={card}
+                    fluid
                     active={picker?.kind === 'board' && picker.board === b && picker.index === i}
                     onClick={() => setPicker({ kind: 'board', board: b, index: i })}
                   />
@@ -345,9 +345,9 @@ export default function Home() {
             <button
               type="button"
               onClick={dealStreet}
-              className="self-start text-xs px-3 py-1.5 rounded bg-emerald-800 hover:bg-emerald-700 text-emerald-100 font-medium"
+              className="w-full text-sm px-3 py-2 rounded-lg bg-emerald-800 hover:bg-emerald-700 text-emerald-100 font-medium"
             >
-              🎲 Deal {nextStreet}
+              Deal {nextStreet}
             </button>
           )}
           {!equityEnabled && (
