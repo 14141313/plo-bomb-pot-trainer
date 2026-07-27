@@ -243,20 +243,23 @@ export default function Home() {
         {/* Table setup */}
         <section className="rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-3 flex flex-col gap-3">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-            <label className="flex items-center gap-2">
-              Players
-              <select
-                value={playerCount}
-                onChange={(e) => changePlayerCount(Number(e.target.value))}
-                className="rounded border border-zinc-300 dark:border-zinc-700 bg-transparent px-1 py-0.5"
-              >
-                {[2, 3, 4, 5, 6, 7, 8].map((n) => (
-                  <option key={n} value={n}>
-                    {n}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <div className="flex items-center gap-2">
+              <span>Players</span>
+              {[4, 5, 6, 7, 8].map((n) => (
+                <button
+                  key={n}
+                  type="button"
+                  onClick={() => changePlayerCount(n)}
+                  className={`px-2.5 py-1 rounded-lg text-sm font-medium border ${
+                    playerCount === n
+                      ? 'bg-amber-500 border-amber-500 text-white'
+                      : 'border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                  }`}
+                >
+                  {n}
+                </button>
+              ))}
+            </div>
 
             <div className="flex rounded-lg overflow-hidden border border-zinc-300 dark:border-zinc-700">
               {([4, 5] as const).map((v) => (
