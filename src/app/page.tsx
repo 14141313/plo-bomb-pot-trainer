@@ -1,65 +1,568 @@
-import Image from "next/image";
+'use client';
+
+/**
+ * Phase 1 sandbox: table setup, card entry, live double-board equity, and
+ * the facing-a-bet pot odds panel. Train and Review build on these pieces.
+ */
+
+import { useMemo, useState } from 'react';
+import type { Card } from '@/engine/cards';
+import { makeDeck } from '@/engine/cards';
+import {
+  ANTE_MAX,
+  ANTE_MIN,
+  ANTE_PRESETS,
+  BET_FRACTIONS,
+  antePot,
+  betSize,
+  effectiveStack,
+  requiredEquityToCall,
+} from '@/engine/betting';
+import { useEquity } from '@/hooks/useEquity';
+import { positionLabels } from '@/lib/positions';
+import { CardBadge } from '@/components/CardBadge';
+import { CardPickerSheet } from '@/components/CardPickerSheet';
+
+type Slot =
+  | { kind: 'hand'; player: number; index: number }
+  | { kind: 'board'; board: number; index: number };
+
+type Variant = 4 | 5;
+
+const emptyHands = (players: number, variant: Variant): (Card | null)[][] =>
+  Array.from({ length: players }, () => Array<Card | null>(variant).fill(null));
+
+const emptyBoards = (): (Card | null)[][] => [
+  Array<Card | null>(5).fill(null),
+  Array<Card | null>(5).fill(null),
+];
+
+/** Contiguous filled prefix of a board; null if there are gaps or 1-2 cards. */
+function boardPrefix(board: (Card | null)[]): Card[] | null {
+  const cards: Card[] = [];
+  let ended = false;
+  for (const c of board) {
+    if (c === null) {
+      ended = true;
+    } else if (ended) {
+      return null; // gap
+    } else {
+      cards.push(c);
+    }
+  }
+  return cards.length === 1 || cards.length === 2 ? null : cards;
+}
+
+const pct = (x: number) => `${(x * 100).toFixed(1)}%`;
 
 export default function Home() {
+  const [playerCount, setPlayerCount] = useState(4);
+  const [variant, setVariant] = useState<Variant>(4);
+  const [doubleBoard, setDoubleBoard] = useState(true);
+  const [ante, setAnte] = useState(6);
+  const [hands, setHands] = useState<(Card | null)[][]>(() => emptyHands(4, 4));
+  const [boards, setBoards] = useState<(Card | null)[][]>(emptyBoards);
+  const [picker, setPicker] = useState<Slot | null>(null);
+  const [betFraction, setBetFraction] = useState<number | 'allin' | null>(null);
+  const [potOverride, setPotOverride] = useState<number | null>(null);
+
+  const positions = positionLabels(playerCount);
+  const nBoards = doubleBoard ? 2 : 1;
+  const stack = effectiveStack(ante);
+  const defaultPot = antePot(ante, playerCount);
+  const pot = potOverride ?? defaultPot;
+
+  const usedCards = useMemo(() => {
+    const s = new Set<Card>();
+    for (const h of hands) for (const c of h) if (c !== null) s.add(c);
+    for (const b of boards) for (const c of b) if (c !== null) s.add(c);
+    return s;
+  }, [hands, boards]);
+
+  // Players with complete hands participate in the equity calc.
+  const completePlayers = useMemo(
+    () =>
+      hands
+        .map((h, i) => ({ index: i, cards: h.filter((c): c is Card => c !== null) }))
+        .filter((p) => p.cards.length === variant),
+    [hands, variant],
+  );
+
+  const activeBoards = useMemo(() => {
+    const prefixes = boards.slice(0, nBoards).map(boardPrefix);
+    return prefixes.every((p) => p !== null) ? (prefixes as Card[][]) : null;
+  }, [boards, nBoards]);
+
+  const equityEnabled = completePlayers.length >= 2 && activeBoards !== null;
+
+  const { result, running, progress } = useEquity({
+    players: completePlayers.map((p) => p.cards),
+    boards: activeBoards ?? [],
+    enabled: equityEnabled,
+  });
+
+  // Guard against a stale result while inputs are changing.
+  const liveResult =
+    result && result.players.length === completePlayers.length ? result : null;
+
+  const allBoardsComplete =
+    activeBoards !== null && activeBoards.every((b) => b.length === 5);
+
+  const leaders = useMemo(() => {
+    if (!liveResult) return [];
+    return Array.from({ length: nBoards }, (_, b) => {
+      let best = -1;
+      let bestIdx = -1;
+      for (let p = 0; p < liveResult.players.length; p++) {
+        const eq = liveResult.players[p].perBoard[b]?.equity ?? 0;
+        if (eq > best) {
+          best = eq;
+          bestIdx = p;
+        }
+      }
+      return bestIdx;
+    });
+  }, [liveResult, nBoards]);
+
+  function setSlot(slot: Slot, card: Card | null) {
+    if (slot.kind === 'hand') {
+      setHands((prev) =>
+        prev.map((h, i) =>
+          i === slot.player ? h.map((c, j) => (j === slot.index ? card : c)) : h,
+        ),
+      );
+    } else {
+      setBoards((prev) =>
+        prev.map((b, i) =>
+          i === slot.board ? b.map((c, j) => (j === slot.index ? card : c)) : b,
+        ),
+      );
+    }
+  }
+
+  function advancePicker(slot: Slot) {
+    const size = slot.kind === 'hand' ? variant : 5;
+    const next = slot.index + 1;
+    if (next < size) {
+      setPicker({ ...slot, index: next });
+    } else {
+      setPicker(null);
+    }
+  }
+
+  function handlePick(card: Card) {
+    if (!picker) return;
+    setSlot(picker, card);
+    advancePicker(picker);
+  }
+
+  function drawFrom(pool: Card[]): Card {
+    const i = Math.floor(Math.random() * pool.length);
+    return pool.splice(i, 1)[0];
+  }
+
+  function dealHands() {
+    const pool = makeDeck().filter((c) => !usedCards.has(c));
+    setHands((prev) =>
+      prev.map((h) => h.map((c) => (c !== null ? c : drawFrom(pool)))),
+    );
+  }
+
+  function dealBoardStreet(boardIdx: number) {
+    const board = boards[boardIdx];
+    const filled = board.filter((c) => c !== null).length;
+    const target = filled < 3 ? 3 : filled + 1; // flop, then turn, then river
+    if (filled >= 5) return;
+    const pool = makeDeck().filter((c) => !usedCards.has(c));
+    setBoards((prev) =>
+      prev.map((b, i) =>
+        i === boardIdx
+          ? b.map((c, j) => (c === null && j < target ? drawFrom(pool) : c))
+          : b,
+      ),
+    );
+  }
+
+  function endHand() {
+    setHands(emptyHands(playerCount, variant));
+    setBoards(emptyBoards());
+    setPicker(null);
+    setBetFraction(null);
+    setPotOverride(null);
+  }
+
+  function changePlayerCount(n: number) {
+    setPlayerCount(n);
+    setHands((prev) => {
+      const next = emptyHands(n, variant);
+      for (let i = 0; i < Math.min(prev.length, n); i++) next[i] = prev[i];
+      return next;
+    });
+    setPicker(null);
+  }
+
+  function changeVariant(v: Variant) {
+    setVariant(v);
+    setHands((prev) =>
+      prev.map((h) => {
+        const next = Array<Card | null>(v).fill(null);
+        for (let i = 0; i < Math.min(h.length, v); i++) next[i] = h[i];
+        return next;
+      }),
+    );
+    setPicker(null);
+  }
+
+  const pickerLabel =
+    picker === null
+      ? ''
+      : picker.kind === 'hand'
+        ? `${positions[picker.player]} card ${picker.index + 1}`
+        : `Board ${picker.board + 1}, card ${picker.index + 1}`;
+
+  const heroBet =
+    betFraction === null
+      ? null
+      : betFraction === 'allin'
+        ? Math.min(stack, pot) // pot-limit: even all-in can't exceed pot for an opening bet
+        : betSize(betFraction, pot, stack);
+  const requiredEq =
+    heroBet === null ? null : requiredEquityToCall(heroBet, pot + heroBet);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 pb-24">
+      <main className="max-w-3xl mx-auto px-3 py-4 flex flex-col gap-4">
+        <header className="flex items-baseline justify-between">
+          <h1 className="text-lg font-bold">PLO Bomb Pot Trainer</h1>
+          <span className="text-xs text-zinc-500">Phase 1 sandbox</span>
+        </header>
+
+        {/* Table setup */}
+        <section className="rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-3 flex flex-col gap-3">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+            <label className="flex items-center gap-2">
+              Players
+              <select
+                value={playerCount}
+                onChange={(e) => changePlayerCount(Number(e.target.value))}
+                className="rounded border border-zinc-300 dark:border-zinc-700 bg-transparent px-1 py-0.5"
+              >
+                {[2, 3, 4, 5, 6, 7, 8].map((n) => (
+                  <option key={n} value={n}>
+                    {n}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <div className="flex rounded-lg overflow-hidden border border-zinc-300 dark:border-zinc-700">
+              {([4, 5] as const).map((v) => (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => changeVariant(v)}
+                  className={`px-3 py-1 text-sm font-medium ${
+                    variant === v
+                      ? 'bg-amber-500 text-white'
+                      : 'bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                  }`}
+                >
+                  PLO{v}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex rounded-lg overflow-hidden border border-zinc-300 dark:border-zinc-700">
+              {[
+                { label: 'Double board', value: true },
+                { label: 'Single', value: false },
+              ].map((opt) => (
+                <button
+                  key={opt.label}
+                  type="button"
+                  onClick={() => setDoubleBoard(opt.value)}
+                  className={`px-3 py-1 text-sm font-medium ${
+                    doubleBoard === opt.value
+                      ? 'bg-amber-500 text-white'
+                      : 'bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 text-sm">
+            <span>Ante</span>
+            {ANTE_PRESETS.map((a) => (
+              <button
+                key={a}
+                type="button"
+                onClick={() => setAnte(a)}
+                className={`px-2.5 py-1 rounded-lg text-sm font-medium border ${
+                  ante === a
+                    ? 'bg-amber-500 border-amber-500 text-white'
+                    : 'border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                }`}
+              >
+                {a}bb
+              </button>
+            ))}
+            <select
+              value={ante}
+              onChange={(e) => setAnte(Number(e.target.value))}
+              className="rounded border border-zinc-300 dark:border-zinc-700 bg-transparent px-1 py-0.5"
+              aria-label="Custom ante"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              {Array.from({ length: ANTE_MAX - ANTE_MIN + 1 }, (_, i) => i + ANTE_MIN).map(
+                (a) => (
+                  <option key={a} value={a}>
+                    {a}bb
+                  </option>
+                ),
+              )}
+            </select>
+            <span className="text-zinc-500 ml-auto">
+              Pot {defaultPot}bb · Stacks {stack}bb behind
+            </span>
+          </div>
+        </section>
+
+        {/* Boards */}
+        <section className="rounded-xl bg-emerald-900/90 dark:bg-emerald-950 text-white p-3 flex flex-col gap-3">
+          {Array.from({ length: nBoards }, (_, b) => (
+            <div key={b} className="flex items-center gap-2">
+              <span className="w-14 text-xs font-medium text-emerald-200 shrink-0">
+                Board {b + 1}
+              </span>
+              <div className="flex gap-1.5">
+                {boards[b].map((card, i) => (
+                  <CardBadge
+                    key={i}
+                    card={card}
+                    active={picker?.kind === 'board' && picker.board === b && picker.index === i}
+                    onClick={() => setPicker({ kind: 'board', board: b, index: i })}
+                  />
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => dealBoardStreet(b)}
+                className="ml-auto text-xs px-2 py-1 rounded bg-emerald-800 hover:bg-emerald-700 text-emerald-100"
+                title="Deal next street"
+              >
+                🎲 Deal
+              </button>
+            </div>
+          ))}
+          {!equityEnabled && (
+            <p className="text-xs text-emerald-200/80">
+              {completePlayers.length < 2
+                ? 'Enter at least two complete hands to see equity.'
+                : 'Boards need 0, 3, 4, or 5 cards (no gaps) for equity.'}
+            </p>
+          )}
+        </section>
+
+        {/* Players */}
+        <section className="flex flex-col gap-2">
+          {hands.map((hand, p) => {
+            const resultIdx = completePlayers.findIndex((cp) => cp.index === p);
+            const pe = resultIdx >= 0 && liveResult ? liveResult.players[resultIdx] : null;
+            return (
+              <div
+                key={p}
+                className="rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-2.5 flex flex-wrap items-center gap-2"
+              >
+                <div className="w-14 shrink-0">
+                  <div className="text-sm font-semibold">{positions[p]}</div>
+                  <div className="text-[10px] text-zinc-500">{stack}bb</div>
+                </div>
+                <div className="flex gap-1">
+                  {hand.map((card, i) => (
+                    <CardBadge
+                      key={i}
+                      card={card}
+                      size="sm"
+                      active={picker?.kind === 'hand' && picker.player === p && picker.index === i}
+                      onClick={() => setPicker({ kind: 'hand', player: p, index: i })}
+                    />
+                  ))}
+                </div>
+                {pe && (
+                  <div className="ml-auto flex items-center gap-3 text-right text-xs tabular-nums">
+                    {doubleBoard ? (
+                      <>
+                        <div>
+                          <div className={leaders[0] === resultIdx ? 'font-bold text-amber-600' : ''}>
+                            B1 {pct(pe.perBoard[0].equity)}
+                          </div>
+                          <div className={leaders[1] === resultIdx ? 'font-bold text-amber-600' : ''}>
+                            B2 {pct(pe.perBoard[1]?.equity ?? 0)}
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-base font-bold">{pct(pe.combined)}</div>
+                          <div className="text-[10px] text-zinc-500">
+                            scoop {pct(pe.scoopPct)}
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div
+                        className={`text-base font-bold ${leaders[0] === resultIdx ? 'text-amber-600' : ''}`}
+                      >
+                        {pct(pe.combined)}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </section>
+
+        {/* Equity status */}
+        {equityEnabled && (
+          <div className="text-xs text-zinc-500 flex items-center gap-2">
+            {running ? (
+              <>
+                <span className="inline-block w-24 h-1.5 rounded bg-zinc-200 dark:bg-zinc-800 overflow-hidden">
+                  <span
+                    className="block h-full bg-amber-500 transition-all"
+                    style={{ width: `${progress * 100}%` }}
+                  />
+                </span>
+                simulating…
+              </>
+            ) : liveResult ? (
+              <span>
+                {liveResult.method === 'exact'
+                  ? `exact · ${liveResult.samples.toLocaleString()} runouts`
+                  : `Monte Carlo · ${liveResult.samples.toLocaleString()} samples`}
+              </span>
+            ) : null}
+          </div>
+        )}
+
+        {/* Facing a bet */}
+        <section className="rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-3 flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-semibold">
+              Facing a bet {allBoardsComplete ? '· pot odds check' : '· EV projection (cards to come)'}
+            </h2>
+            <label className="text-xs flex items-center gap-1 text-zinc-500">
+              Pot
+              <input
+                type="number"
+                min={0}
+                value={pot}
+                onChange={(e) => setPotOverride(Number(e.target.value))}
+                className="w-16 rounded border border-zinc-300 dark:border-zinc-700 bg-transparent px-1 py-0.5 text-right"
+              />
+              bb
+            </label>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {BET_FRACTIONS.map((f) => (
+              <button
+                key={f}
+                type="button"
+                onClick={() => setBetFraction(f)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium border ${
+                  betFraction === f
+                    ? 'bg-amber-500 border-amber-500 text-white'
+                    : 'border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                }`}
+              >
+                {f * 100}%
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={() => setBetFraction('allin')}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium border ${
+                betFraction === 'allin'
+                  ? 'bg-red-600 border-red-600 text-white'
+                  : 'border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+              }`}
             >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+              All-In
+            </button>
+          </div>
+          {heroBet !== null && requiredEq !== null && (
+            <div className="text-sm flex flex-col gap-1.5">
+              <p className="text-zinc-600 dark:text-zinc-300">
+                Bet <strong>{heroBet.toFixed(1)}bb</strong> into {pot}bb → caller needs{' '}
+                <strong>{pct(requiredEq)}</strong> equity
+              </p>
+              {liveResult && (
+                <div className="flex flex-col gap-1">
+                  {completePlayers.map((cp, i) => {
+                    const pe = liveResult.players[i];
+                    if (!pe) return null;
+                    const call = pe.combined >= requiredEq;
+                    return (
+                      <div key={cp.index} className="flex items-center gap-2 text-xs">
+                        <span className="w-14 font-medium">{positions[cp.index]}</span>
+                        <span className="tabular-nums">{pct(pe.combined)} combined</span>
+                        <span
+                          className={`px-1.5 py-0.5 rounded font-semibold ${
+                            call
+                              ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300'
+                              : 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'
+                          }`}
+                        >
+                          {call ? 'CALL ✓' : 'FOLD'}
+                        </span>
+                        {doubleBoard && pe.perBoard[1] && (
+                          <span className="text-zinc-500 tabular-nums">
+                            (B1 {pct(pe.perBoard[0].equity)} / B2 {pct(pe.perBoard[1].equity)})
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+        </section>
+
+        {/* Actions */}
+        <div className="fixed bottom-0 inset-x-0 bg-white/90 dark:bg-zinc-900/90 backdrop-blur border-t border-zinc-200 dark:border-zinc-800">
+          <div className="max-w-3xl mx-auto px-3 py-2.5 flex gap-2">
+            <button
+              type="button"
+              onClick={dealHands}
+              className="flex-1 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-semibold text-sm"
+            >
+              Deal hands
+            </button>
+            <button
+              type="button"
+              onClick={endHand}
+              className="flex-1 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 font-semibold text-sm"
+            >
+              End Hand
+            </button>
+          </div>
         </div>
       </main>
+
+      {picker && (
+        <CardPickerSheet
+          usedCards={usedCards}
+          targetLabel={pickerLabel}
+          onPick={handlePick}
+          onClear={() => {
+            setSlot(picker, null);
+            setPicker(null);
+          }}
+          onClose={() => setPicker(null)}
+        />
+      )}
     </div>
   );
 }
