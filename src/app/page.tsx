@@ -160,10 +160,11 @@ export default function Home() {
   }
 
   function dealHands() {
+    // Draw outside the state updater: updaters must be pure (StrictMode
+    // runs them twice, which double-drained the pool and dealt phantom 2♣s).
     const pool = makeDeck().filter((c) => !usedCards.has(c));
-    setHands((prev) =>
-      prev.map((h) => h.map((c) => (c !== null ? c : drawFrom(pool)))),
-    );
+    const next = hands.map((h) => h.map((c) => (c !== null ? c : drawFrom(pool))));
+    setHands(next);
   }
 
   // Next street across the active boards: both boards advance together.
@@ -176,14 +177,14 @@ export default function Home() {
   function dealStreet() {
     if (nextStreet === null) return;
     const target = minFilled < 3 ? 3 : minFilled + 1;
+    // Same purity rule as dealHands: draw before setState, not inside it.
     const pool = makeDeck().filter((c) => !usedCards.has(c));
-    setBoards((prev) =>
-      prev.map((b, i) =>
-        i < nBoards
-          ? b.map((c, j) => (c === null && j < target ? drawFrom(pool) : c))
-          : b,
-      ),
+    const next = boards.map((b, i) =>
+      i < nBoards
+        ? b.map((c, j) => (c === null && j < target ? drawFrom(pool) : c))
+        : b,
     );
+    setBoards(next);
   }
 
   function endHand() {
