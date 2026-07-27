@@ -260,7 +260,9 @@ export default function Home() {
                 </button>
               ))}
             </div>
+          </div>
 
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
             <div className="flex rounded-lg overflow-hidden border border-zinc-300 dark:border-zinc-700">
               {([4, 5] as const).map((v) => (
                 <button
