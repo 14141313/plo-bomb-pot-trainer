@@ -9,8 +9,6 @@ import { useMemo, useState } from 'react';
 import type { Card } from '@/engine/cards';
 import { makeDeck } from '@/engine/cards';
 import {
-  ANTE_MAX,
-  ANTE_MIN,
   ANTE_PRESETS,
   BET_FRACTIONS,
   antePot,
@@ -309,20 +307,6 @@ export default function Home() {
                 {a}bb
               </button>
             ))}
-            <select
-              value={ante}
-              onChange={(e) => setAnte(Number(e.target.value))}
-              className="rounded border border-zinc-300 dark:border-zinc-700 bg-transparent px-1 py-0.5"
-              aria-label="Custom ante"
-            >
-              {Array.from({ length: ANTE_MAX - ANTE_MIN + 1 }, (_, i) => i + ANTE_MIN).map(
-                (a) => (
-                  <option key={a} value={a}>
-                    {a}bb
-                  </option>
-                ),
-              )}
-            </select>
             <span className="text-zinc-500 ml-auto">
               Pot {defaultPot}bb · Stacks {stack}bb behind
             </span>

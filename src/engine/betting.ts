@@ -4,9 +4,7 @@
  */
 
 export const STARTING_STACK = 100;
-export const ANTE_MIN = 1;
-export const ANTE_MAX = 10;
-export const ANTE_PRESETS = [3, 6, 10] as const;
+export const ANTE_PRESETS = [2, 4, 6, 8, 10] as const;
 
 /** Fixed bet-size fractions of the pot. 100% is the pot-limit maximum. */
 export const BET_FRACTIONS = [0.25, 0.5, 0.75, 1] as const;

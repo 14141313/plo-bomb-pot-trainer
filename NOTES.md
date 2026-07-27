@@ -18,7 +18,7 @@ opponent logic, no Review mode yet.
   pot-limit bet cap, pot-limit raise cap computed from the pot *after* the
   call, all-in clamped to effective stack. Unit tested.
 - **Sandbox UI** (`src/app/page.tsx`): table setup (2-8 players, PLO4/5,
-  single/double board, ante 1-10bb with 3/6/10 presets), card picker bottom
+  single/double board, ante preset buttons 2/4/6/8/10bb), card picker bottom
   sheet with cross-table duplicate prevention, two boards with per-street
   deal buttons, per-board + combined + scoop equity with leader highlight,
   facing-a-bet panel, End Hand reset. Mobile-checked at 375px.
