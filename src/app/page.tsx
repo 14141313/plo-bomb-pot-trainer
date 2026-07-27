@@ -166,15 +166,20 @@ export default function Home() {
     );
   }
 
-  function dealBoardStreet(boardIdx: number) {
-    const board = boards[boardIdx];
-    const filled = board.filter((c) => c !== null).length;
-    const target = filled < 3 ? 3 : filled + 1; // flop, then turn, then river
-    if (filled >= 5) return;
+  // Next street across the active boards: both boards advance together.
+  const minFilled = Math.min(
+    ...boards.slice(0, nBoards).map((b) => b.filter((c) => c !== null).length),
+  );
+  const nextStreet =
+    minFilled < 3 ? 'flop' : minFilled === 3 ? 'turn' : minFilled === 4 ? 'river' : null;
+
+  function dealStreet() {
+    if (nextStreet === null) return;
+    const target = minFilled < 3 ? 3 : minFilled + 1;
     const pool = makeDeck().filter((c) => !usedCards.has(c));
     setBoards((prev) =>
       prev.map((b, i) =>
-        i === boardIdx
+        i < nBoards
           ? b.map((c, j) => (c === null && j < target ? drawFrom(pool) : c))
           : b,
       ),
@@ -330,16 +335,17 @@ export default function Home() {
                   />
                 ))}
               </div>
-              <button
-                type="button"
-                onClick={() => dealBoardStreet(b)}
-                className="ml-auto text-xs px-2 py-1 rounded bg-emerald-800 hover:bg-emerald-700 text-emerald-100"
-                title="Deal next street"
-              >
-                🎲 Deal
-              </button>
             </div>
           ))}
+          {nextStreet !== null && (
+            <button
+              type="button"
+              onClick={dealStreet}
+              className="self-start text-xs px-3 py-1.5 rounded bg-emerald-800 hover:bg-emerald-700 text-emerald-100 font-medium"
+            >
+              🎲 Deal {nextStreet}
+            </button>
+          )}
           {!equityEnabled && (
             <p className="text-xs text-emerald-200/80">
               {completePlayers.length < 2
