@@ -234,14 +234,14 @@ export default function Home() {
     heroBet === null ? null : requiredEquityToCall(heroBet, pot + heroBet);
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 pb-24">
+    <div className="min-h-screen bg-background text-foreground pb-24">
       <main className="max-w-3xl mx-auto px-3 py-4 flex flex-col gap-4">
         <header>
           <h1 className="text-lg font-bold">PLO Bomb Pot Trainer</h1>
         </header>
 
         {/* Table setup */}
-        <section className="rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-3 flex flex-col gap-3">
+        <section className="rounded-xl bg-surface border border-line p-3 flex flex-col gap-3">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
             <div className="flex items-center gap-2">
               <span>Players</span>
@@ -253,7 +253,7 @@ export default function Home() {
                   className={`px-2.5 py-1 rounded-lg text-sm font-medium border ${
                     playerCount === n
                       ? 'bg-accent border-accent text-accent-fg'
-                      : 'border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                      : 'border-line-2 hover:bg-surface-2'
                   }`}
                 >
                   {n}
@@ -263,7 +263,7 @@ export default function Home() {
           </div>
 
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-            <div className="flex rounded-lg overflow-hidden border border-zinc-300 dark:border-zinc-700">
+            <div className="flex rounded-lg overflow-hidden border border-line-2">
               {([4, 5] as const).map((v) => (
                 <button
                   key={v}
@@ -272,7 +272,7 @@ export default function Home() {
                   className={`px-3 py-1 text-sm font-medium ${
                     variant === v
                       ? 'bg-accent text-accent-fg'
-                      : 'bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                      : 'bg-transparent hover:bg-surface-2'
                   }`}
                 >
                   PLO{v}
@@ -280,7 +280,7 @@ export default function Home() {
               ))}
             </div>
 
-            <div className="flex rounded-lg overflow-hidden border border-zinc-300 dark:border-zinc-700">
+            <div className="flex rounded-lg overflow-hidden border border-line-2">
               {[
                 { label: 'Double board', value: true },
                 { label: 'Single', value: false },
@@ -292,7 +292,7 @@ export default function Home() {
                   className={`px-3 py-1 text-sm font-medium ${
                     doubleBoard === opt.value
                       ? 'bg-accent text-accent-fg'
-                      : 'bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                      : 'bg-transparent hover:bg-surface-2'
                   }`}
                 >
                   {opt.label}
@@ -311,23 +311,23 @@ export default function Home() {
                 className={`px-2.5 py-1 rounded-lg text-sm font-medium border ${
                   ante === a
                     ? 'bg-accent border-accent text-accent-fg'
-                    : 'border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                    : 'border-line-2 hover:bg-surface-2'
                 }`}
               >
                 {a}bb
               </button>
             ))}
-            <span className="text-zinc-500 ml-auto">
+            <span className="text-ink-3 ml-auto">
               Pot {defaultPot}bb · Stacks {stack}bb behind
             </span>
           </div>
         </section>
 
         {/* Boards */}
-        <section className="rounded-xl bg-felt border-4 border-rail text-zinc-900 p-3 flex flex-col gap-3">
+        <section className="rounded-xl bg-felt border-4 border-rail text-seat p-3 flex flex-col gap-3">
           {Array.from({ length: nBoards }, (_, b) => (
             <div key={b} className="flex items-center gap-2">
-              <span className="w-14 text-xs font-medium text-zinc-700 shrink-0">
+              <span className="w-14 text-xs font-medium text-rail shrink-0">
                 Board {b + 1}
               </span>
               <div className="flex gap-1.5 flex-1">
@@ -353,7 +353,7 @@ export default function Home() {
             </button>
           )}
           {!equityEnabled && (
-            <p className="text-xs text-zinc-700">
+            <p className="text-xs text-rail">
               {completePlayers.length < 2
                 ? 'Enter at least two complete hands to see equity.'
                 : 'Boards need 0, 3, 4, or 5 cards (no gaps) for equity.'}
@@ -369,11 +369,11 @@ export default function Home() {
             return (
               <div
                 key={p}
-                className="rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-2.5 flex flex-wrap items-center gap-2"
+                className="rounded-xl bg-surface border border-line p-2.5 flex flex-wrap items-center gap-2"
               >
                 <div className="w-14 shrink-0">
                   <div className="text-sm font-semibold">{positions[p]}</div>
-                  <div className="text-[10px] text-zinc-500">{stack}bb</div>
+                  <div className="text-[10px] text-ink-3">{stack}bb</div>
                 </div>
                 <div className="flex gap-1">
                   {hand.map((card, i) => (
@@ -400,7 +400,7 @@ export default function Home() {
                         </div>
                         <div>
                           <div className="text-base font-bold">{pct(pe.combined)}</div>
-                          <div className="text-[10px] text-zinc-500">
+                          <div className="text-[10px] text-ink-3">
                             scoop {pct(pe.scoopPct)}
                           </div>
                         </div>
@@ -421,10 +421,10 @@ export default function Home() {
 
         {/* Equity status */}
         {equityEnabled && (
-          <div className="text-xs text-zinc-500 flex items-center gap-2">
+          <div className="text-xs text-ink-3 flex items-center gap-2">
             {running ? (
               <>
-                <span className="inline-block w-24 h-1.5 rounded bg-zinc-200 dark:bg-zinc-800 overflow-hidden">
+                <span className="inline-block w-24 h-1.5 rounded bg-surface-2 overflow-hidden">
                   <span
                     className="block h-full bg-accent transition-all"
                     style={{ width: `${progress * 100}%` }}
@@ -443,12 +443,12 @@ export default function Home() {
         )}
 
         {/* Facing a bet */}
-        <section className="rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-3 flex flex-col gap-2">
+        <section className="rounded-xl bg-surface border border-line p-3 flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold">
               Facing a bet {allBoardsComplete ? '· pot odds check' : '· EV projection (cards to come)'}
             </h2>
-            <label className="text-xs flex items-center gap-1 text-zinc-500">
+            <label className="text-xs flex items-center gap-1 text-ink-3">
               Pot
               <input
                 type="number"
@@ -457,7 +457,7 @@ export default function Home() {
                 onChange={(e) => setPotOverride(Number(e.target.value))}
                 /* text-base on mobile: iOS Safari zooms the whole page when an
                    input's text is under 16px. */
-                className="nums w-16 rounded border border-zinc-300 dark:border-zinc-700 bg-transparent px-1 py-0.5 text-right text-base sm:text-xs"
+                className="nums w-16 rounded border border-line-2 bg-transparent px-1 py-0.5 text-right text-base sm:text-xs"
               />
               bb
             </label>
@@ -471,7 +471,7 @@ export default function Home() {
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium border ${
                   betFraction === f
                     ? 'bg-accent border-accent text-accent-fg'
-                    : 'border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                    : 'border-line-2 hover:bg-surface-2'
                 }`}
               >
                 {f * 100}%
@@ -482,8 +482,8 @@ export default function Home() {
               onClick={() => setBetFraction('allin')}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium border ${
                 betFraction === 'allin'
-                  ? 'bg-red-600 border-red-600 text-white'
-                  : 'border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                  ? 'bg-suit-hearts border-suit-hearts text-white'
+                  : 'border-line-2 hover:bg-surface-2'
               }`}
             >
               All-In
@@ -491,7 +491,7 @@ export default function Home() {
           </div>
           {heroBet !== null && requiredEq !== null && (
             <div className="text-sm flex flex-col gap-1.5">
-              <p className="text-zinc-600 dark:text-zinc-300">
+              <p className="text-ink-2">
                 Bet <strong>{heroBet.toFixed(1)}bb</strong> into {pot}bb → caller needs{' '}
                 <strong>{pct(requiredEq)}</strong> equity
               </p>
@@ -508,14 +508,14 @@ export default function Home() {
                         <span
                           className={`px-1.5 py-0.5 rounded font-semibold ${
                             call
-                              ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300'
-                              : 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'
+                              ? 'bg-good-bg text-good-fg'
+                              : 'bg-bad-bg text-bad-fg'
                           }`}
                         >
                           {call ? 'CALL ✓' : 'FOLD'}
                         </span>
                         {doubleBoard && pe.perBoard[1] && (
-                          <span className="text-zinc-500 tabular-nums">
+                          <span className="text-ink-3 tabular-nums">
                             (B1 {pct(pe.perBoard[0].equity)} / B2 {pct(pe.perBoard[1].equity)})
                           </span>
                         )}
@@ -529,7 +529,7 @@ export default function Home() {
         </section>
 
         {/* Actions */}
-        <div className="fixed bottom-0 inset-x-0 bg-white/90 dark:bg-zinc-900/90 backdrop-blur border-t border-zinc-200 dark:border-zinc-800">
+        <div className="fixed bottom-0 inset-x-0 bg-surface/90 backdrop-blur border-t border-line">
           <div className="max-w-3xl mx-auto px-3 py-2.5 flex gap-2">
             <button
               type="button"
@@ -541,7 +541,7 @@ export default function Home() {
             <button
               type="button"
               onClick={endHand}
-              className="flex-1 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 font-semibold text-sm"
+              className="flex-1 py-2 rounded-lg border border-line-2 hover:bg-surface-2 font-semibold text-sm"
             >
               End Hand
             </button>

@@ -35,23 +35,23 @@ export function CardPickerSheet({
         className="absolute inset-0 bg-black/40"
         onClick={onClose}
       />
-      <div className="relative w-full sm:w-auto sm:min-w-[420px] bg-white dark:bg-zinc-900 rounded-t-2xl sm:rounded-2xl p-2 sm:p-4 shadow-xl">
+      <div className="relative w-full sm:w-auto sm:min-w-[420px] bg-surface rounded-t-2xl sm:rounded-2xl p-2 sm:p-4 shadow-xl">
         <div className="flex items-center justify-between mb-3">
-          <span className="text-sm font-medium text-zinc-600 dark:text-zinc-300">
+          <span className="text-sm font-medium text-ink-2">
             Pick: {targetLabel}
           </span>
           <div className="flex gap-2">
             <button
               type="button"
               onClick={onClear}
-              className="text-xs px-2 py-1 rounded border border-zinc-300 dark:border-zinc-600 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              className="text-xs px-2 py-1 rounded border border-line-2 text-ink-2 hover:bg-surface-2"
             >
               Clear slot
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="text-xs px-2 py-1 rounded border border-zinc-300 dark:border-zinc-600 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              className="text-xs px-2 py-1 rounded border border-line-2 text-ink-2 hover:bg-surface-2"
             >
               Done
             </button>
@@ -80,7 +80,7 @@ export function CardPickerSheet({
                     className={`h-10 sm:h-9 min-w-0 rounded text-xs sm:text-sm font-bold transition-opacity
                       ${
                         used
-                          ? 'bg-zinc-200 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-600 cursor-not-allowed'
+                          ? 'bg-surface-2 text-edge cursor-not-allowed'
                           : `${suitBgClass(suit)} text-white hover:opacity-80`
                       }`}
                   >

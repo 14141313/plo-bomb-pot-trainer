@@ -132,7 +132,7 @@ export function PokerTable({ seats, pot, heroSeat, boards, inHand }: PokerTableP
             ))}
           </div>
         ))}
-        <div className="text-zinc-900 font-bold text-sm mt-1">Total pot: {pot.toFixed(1)} BB</div>
+        <div className="text-seat font-bold text-sm mt-1">Total pot: {pot.toFixed(1)} BB</div>
       </div>
 
       {ordered.map((s, display) => {
@@ -177,13 +177,13 @@ export function PokerTable({ seats, pot, heroSeat, boards, inHand }: PokerTableP
               >
                 <span className="flex items-center gap-0.5 text-[11px] font-semibold text-white">
                   {s.isDealer && (
-                    <span className="w-3 h-3 rounded-full bg-white text-zinc-900 text-[8px] font-bold flex items-center justify-center">
+                    <span className="w-3 h-3 rounded-full bg-felt text-seat text-[8px] font-bold flex items-center justify-center">
                       D
                     </span>
                   )}
                   {s.label}
                 </span>
-                <span className="text-[10px] text-zinc-400">
+                <span className="text-[10px] text-ink-3">
                   {s.stack.toFixed(s.stack % 1 === 0 ? 0 : 1)}
                 </span>
               </div>
@@ -192,10 +192,10 @@ export function PokerTable({ seats, pot, heroSeat, boards, inHand }: PokerTableP
             {/* Chips committed this street */}
             {s.committed > 0 && (
               <div
-                className="absolute -translate-x-1/2 -translate-y-1/2 flex items-center gap-1 rounded-full bg-zinc-900 border border-zinc-600 px-1.5 py-0.5 text-[11px] text-white font-semibold whitespace-nowrap"
+                className="absolute -translate-x-1/2 -translate-y-1/2 flex items-center gap-1 rounded-full bg-seat border border-seat-border px-1.5 py-0.5 text-[11px] text-white font-semibold whitespace-nowrap"
                 style={{ left: `${chip.x}%`, top: `${chip.y}%` }}
               >
-                <span className="w-2 h-2 rounded-full bg-amber-400" />
+                <span className="w-2 h-2 rounded-full bg-to-act" />
                 {s.committed % 1 === 0 ? s.committed : s.committed.toFixed(1)}
               </div>
             )}

@@ -15,7 +15,7 @@ const TABS = [
 export function TabNav() {
   const pathname = usePathname();
   return (
-    <nav className="border-b border-zinc-200 dark:border-zinc-800">
+    <nav className="border-b border-line">
       <div className="mx-auto max-w-3xl flex items-center gap-1 px-4">
         {TABS.map((tab) => {
           const active = pathname.startsWith(tab.href);
@@ -26,7 +26,7 @@ export function TabNav() {
               className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${
                 active
                   ? 'border-accent text-accent-text'
-                  : 'border-transparent text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
+                  : 'border-transparent text-ink-3 hover:text-foreground'
               }`}
             >
               {tab.label}

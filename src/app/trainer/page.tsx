@@ -259,12 +259,12 @@ export default function TrainerPage() {
       <h1 className="text-lg font-bold">Trainer</h1>
 
       {!hand && (
-        <section className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-3 flex flex-col gap-3">
-          <div className="text-xs text-zinc-500">
+        <section className="rounded-xl border border-line p-3 flex flex-col gap-3">
+          <div className="text-xs text-ink-3">
             Trainer is fixed at {TRAINER_PLAYER_COUNT}-handed for now.
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <div className="flex rounded-lg overflow-hidden border border-zinc-300 dark:border-zinc-700">
+            <div className="flex rounded-lg overflow-hidden border border-line-2">
               {([4, 5] as const).map((v) => (
                 <button
                   key={v}
@@ -278,7 +278,7 @@ export default function TrainerPage() {
                 </button>
               ))}
             </div>
-            <div className="flex rounded-lg overflow-hidden border border-zinc-300 dark:border-zinc-700">
+            <div className="flex rounded-lg overflow-hidden border border-line-2">
               {[
                 { label: 'Double board', value: true },
                 { label: 'Single', value: false },
@@ -306,7 +306,7 @@ export default function TrainerPage() {
                 className={`px-2.5 py-1 rounded-lg font-medium border ${
                   config.ante === a
                     ? 'bg-accent border-accent text-accent-fg'
-                    : 'border-zinc-300 dark:border-zinc-700'
+                    : 'border-line-2'
                 }`}
               >
                 {a}bb
@@ -333,7 +333,7 @@ export default function TrainerPage() {
             inHand={!hand.complete}
           />
 
-          <div className="flex items-center justify-between text-xs text-zinc-500">
+          <div className="flex items-center justify-between text-xs text-ink-3">
             {/* Natural case in the data, presentation in CSS, so copy never
                 has to be rewritten for a restyle. */}
             <span className="uppercase tracking-wide">{hand.street}</span>
@@ -353,13 +353,13 @@ export default function TrainerPage() {
           {!hand.complete && (
             <section>
               {!heroTurn && (
-                <div className="text-zinc-500 text-xs py-3 text-center">
+                <div className="text-ink-3 text-xs py-3 text-center">
                   {running || !equities ? 'Calculating equity…' : 'Opponents acting…'}
                 </div>
               )}
               {heroTurn && scored && (
                 <>
-                  <div className="text-xs text-zinc-500 mb-2">
+                  <div className="text-xs text-ink-3 mb-2">
                     {scored.toCall > 0
                       ? `Facing ${scored.toCall.toFixed(1)}bb into ${hand.pot.toFixed(1)}bb`
                       : 'Checked to you'}
@@ -378,10 +378,10 @@ export default function TrainerPage() {
           )}
 
           {hand.complete && (
-            <section className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-3 flex flex-col gap-3">
+            <section className="rounded-xl border border-line p-3 flex flex-col gap-3">
               <div className="font-semibold">Hand review</div>
 
-              <div className="text-xs text-zinc-500">
+              <div className="text-xs text-ink-3">
                 Hands that reached showdown are revealed at their seats above;
                 folded hands are mucked.
               </div>
@@ -390,12 +390,12 @@ export default function TrainerPage() {
                 {entries.map((e, i) => (
                   <div
                     key={i}
-                    className="nums rounded-lg border border-zinc-200 dark:border-zinc-800 p-2 text-xs flex flex-col gap-1"
+                    className="nums rounded-lg border border-line p-2 text-xs flex flex-col gap-1"
                   >
                     <div className="flex items-center gap-2">
                       <GradePill grade={e.grade} />
-                      <span className="uppercase tracking-wide text-zinc-500">{e.street}</span>
-                      <span className="ml-auto text-zinc-500 nums">
+                      <span className="uppercase tracking-wide text-ink-3">{e.street}</span>
+                      <span className="ml-auto text-ink-3 nums">
                         {(e.equity * 100).toFixed(1)}% equity · pot {e.pot.toFixed(1)}bb
                       </span>
                     </div>
@@ -411,12 +411,12 @@ export default function TrainerPage() {
                         {e.best.ev.toFixed(2)}bb) — cost {e.evLoss.toFixed(2)}bb
                       </div>
                     ) : (
-                      <div className="text-emerald-500">Optimal play</div>
+                      <div className="text-good-fg">Optimal play</div>
                     )}
                   </div>
                 ))}
                 {entries.length === 0 && (
-                  <div className="text-xs text-zinc-500">
+                  <div className="text-xs text-ink-3">
                     No decisions to score — the hand ended before it reached you.
                   </div>
                 )}
@@ -432,7 +432,7 @@ export default function TrainerPage() {
               <button
                 type="button"
                 onClick={() => setHand(null)}
-                className="w-full py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 font-medium"
+                className="w-full py-2 rounded-lg border border-line-2 font-medium"
               >
                 Change setup
               </button>
@@ -442,11 +442,11 @@ export default function TrainerPage() {
       )}
 
       {session.length > 0 && (
-        <section className="nums rounded-xl border border-zinc-200 dark:border-zinc-800 p-3">
+        <section className="nums rounded-xl border border-line p-3">
           <div className="flex items-center gap-2 mb-2">
             <span className="font-semibold">Session</span>
             {sessionGrade && <GradePill grade={sessionGrade} />}
-            <span className="ml-auto text-xs text-zinc-500">
+            <span className="ml-auto text-xs text-ink-3">
               {session.length} hand{session.length === 1 ? '' : 's'} · {sessionLoss.toFixed(2)}bb
               given up
             </span>
@@ -455,14 +455,14 @@ export default function TrainerPage() {
             {session.map((h) => (
               <div key={h.id} className="flex items-center gap-2 text-xs">
                 {h.grade && <GradePill grade={h.grade} />}
-                <span className="text-zinc-500">
+                <span className="text-ink-3">
                   {h.entries.length} decision{h.entries.length === 1 ? '' : 's'}
                 </span>
-                <span className="ml-auto text-zinc-500">−{h.evLoss.toFixed(2)}bb</span>
+                <span className="ml-auto text-ink-3">−{h.evLoss.toFixed(2)}bb</span>
               </div>
             ))}
           </div>
-          <p className="mt-2 text-[11px] text-zinc-500">
+          <p className="mt-2 text-[11px] text-ink-3">
             Session only — hands are not saved yet. Sign-in and history land with Supabase.
           </p>
         </section>

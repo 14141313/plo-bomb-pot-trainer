@@ -26,6 +26,23 @@
   --background: #ffffff;
   --foreground: #171717;
 
+  /* Neutrals. Semantic, mode-flipping tokens replace every stock zinc-*
+     utility, so components carry no dark: colour pairs and every neutral
+     traces here. Hue 286 matches the seat/felt family. */
+  --surface: #ffffff;
+  --surface-2: #f4f4f5;
+  --line: #e4e4e7;
+  --line-2: #d4d4d8;
+  --ink-2: #52525b;
+  --ink-3: #71717a;
+  --edge: #a1a1aa;
+
+  /* Verdict pills (CALL/FOLD, optimal/costly): palette hues 156.7 and 25. */
+  --good-bg: #d8f3e4;
+  --good-fg: #14684a;
+  --bad-bg: #fde3e0;
+  --bad-fg: #a01f1f;
+
   /* Card suits.
      Lightness sits in a BAND (0.52-0.58), not one value: forcing all four to
      one L crushed the reds' available chroma and the set went muted. Each
@@ -59,14 +76,17 @@
      white: white on this yellow measures 2.14:1, well under the 4.5:1 floor.
      --accent-text is the mid-lightness variant for accent-coloured text and
      borders, which must work on both the light and dark page background. */
-  --accent: #f4a434;
-  --accent-fg: #171717;
-  --accent-text: #8e5d1a;
+  /* Accent = the brand blue, hue 266.1 — the diamonds family. It was amber
+     (Tailwind's stock hue in OKLCH clothing); an accent must trace to the
+     palette, and the yellow band is deliberately not in it. */
+  --accent: #305dff;
+  --accent-fg: #ffffff;
+  --accent-text: #305dff;
   /* State tokens are placed IN the palette, not inherited from Tailwind:
      to-act shares the accent's hue (70.1) so the action glow and the accent
      read as one family; hero shares the clubs hue (156.7); leader shares the
      grade-D hue (55) for "currently winning" text on light cards. */
-  --to-act: #fabd75;
+  --to-act: #9ab6f8;
   --hero: #3bd388;
   --leader: #a95c1d;
 }
@@ -75,6 +95,19 @@
   :root {
     --background: oklch(1 0 0);
     --foreground: oklch(0.205 0 0);
+
+    --surface: oklch(1 0 0);
+    --surface-2: oklch(0.967 0.001 286.4);
+    --line: oklch(0.92 0.004 286.3);
+    --line-2: oklch(0.871 0.005 286.3);
+    --ink-2: oklch(0.442 0.015 285.8);
+    --ink-3: oklch(0.552 0.014 285.9);
+    --edge: oklch(0.712 0.013 286.1);
+
+    --good-bg: oklch(0.95 0.045 156.7);
+    --good-fg: oklch(0.45 0.11 156.7);
+    --bad-bg: oklch(0.93 0.04 25);
+    --bad-fg: oklch(0.48 0.16 25);
 
     --suit-spades: oklch(0.52 0 89.9);
     --suit-clubs: oklch(0.55 0.132 156.7);
@@ -94,10 +127,10 @@
     --card-back: oklch(0.372 0.039 257.3);
     --card-back-edge: oklch(0.554 0.041 257.4);
 
-    --accent: oklch(0.78 0.152 70.1);
-    --accent-fg: oklch(0.205 0 0);
-    --accent-text: oklch(0.52 0.101 70.1);
-    --to-act: oklch(0.84 0.114 70.1);
+    --accent: oklch(0.555 0.245 266.1);
+    --accent-fg: oklch(1 0 0);
+    --accent-text: oklch(0.555 0.245 266.1);
+    --to-act: oklch(0.78 0.1 266.1);
     --hero: oklch(0.77 0.166 156.7);
     --leader: oklch(0.555 0.124 55);
   }
@@ -107,12 +140,41 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+
+    --surface: #18181b;
+    --surface-2: #27272a;
+    --line: #27272a;
+    --line-2: #3f3f46;
+    --ink-2: #d4d4d8;
+    /* --ink-3 and --edge hold in both modes. */
+
+    --good-bg: #143a2b;
+    --good-fg: #7fd7ac;
+    --bad-bg: #45191b;
+    --bad-fg: #f5a09a;
+
+    /* Blue text can't clear 4.5:1 on white AND near-black at one lightness;
+       dark mode gets the lighter step. */
+    --accent-text: #4372ff;
   }
 
   @supports (color: oklch(0 0 0)) {
     :root {
       --background: oklch(0.145 0 0);
       --foreground: oklch(0.946 0 0);
+
+      --surface: oklch(0.21 0.006 285.9);
+      --surface-2: oklch(0.274 0.005 286);
+      --line: oklch(0.274 0.005 286);
+      --line-2: oklch(0.37 0.012 285.8);
+      --ink-2: oklch(0.871 0.005 286.3);
+
+      --good-bg: oklch(0.32 0.06 156.7);
+      --good-fg: oklch(0.82 0.13 156.7);
+      --bad-bg: oklch(0.3 0.08 25);
+      --bad-fg: oklch(0.78 0.11 25);
+
+      --accent-text: oklch(0.6 0.217 266.1);
     }
   }
 }
@@ -120,6 +182,19 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-line-2: var(--line-2);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-edge: var(--edge);
+
+  --color-good-bg: var(--good-bg);
+  --color-good-fg: var(--good-fg);
+  --color-bad-bg: var(--bad-bg);
+  --color-bad-fg: var(--bad-fg);
 
   --color-suit-spades: var(--suit-spades);
   --color-suit-clubs: var(--suit-clubs);

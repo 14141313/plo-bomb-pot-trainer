@@ -170,6 +170,27 @@ the source of the stray yellow. State tokens now hold deliberate places:
 to-act shares the accent hue (70.1), hero shares the clubs hue (156.7),
 leader shares the grade-D hue (55).
 
+### Accent re-hued and full stock-utility sweep (audit follow-up)
+
+- **`--accent` changed hue, not just tune: amber (70.1) → brand blue
+  (266.1, the diamonds family).** The yellow band is deliberately not in the
+  palette. Accent fill is `oklch(0.555 0.245 266.1)` with white text
+  (5.08:1); `--accent-text` is mode-flipping because no single blue lightness
+  clears 4.5:1 on both white and near-black (light mode L 0.555 → 5.08:1 on
+  white, dark mode L 0.6 → 4.78:1 on dark). `--to-act` follows the accent
+  hue at L 0.78.
+- **Zero stock Tailwind colour utilities remain in components** (was 17+
+  distinct). Neutrals live as semantic mode-flipping tokens — `surface`,
+  `surface-2`, `line`, `line-2`, `ink-2`, `ink-3`, `edge` — so components no
+  longer carry `dark:` colour pairs at all; the flip happens in the tokens.
+  Verdict pills use `good-bg/fg`, `bad-bg/fg` at palette hues 156.7 and 25.
+- Fixed-surface elements deliberately do NOT flip: the felt is always light,
+  so the pot label and dealer disc use fixed tokens (`seat`, `felt`) rather
+  than `surface`/`foreground`, which would invert on them in dark mode.
+- Type scale: the `text-sm`/`text-xs`/`text-base` steps in use are deliberate
+  per the typography pass (14px UI, 12-13px captions, 16px mobile inputs) —
+  they are the type system, not unreviewed defaults.
+
 ### Dark mode block: intentional
 
 The `@media (prefers-color-scheme: dark)` background/foreground switch is
