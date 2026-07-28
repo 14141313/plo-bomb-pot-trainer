@@ -145,14 +145,36 @@ Two rules hold the palette together:
   leave green washed out and blue shouting. Each hue sits at 90% of its own
   sRGB maximum.
 
+### Suit regeneration (production colour audit)
+
+The first pass forced all four suits to one lightness (L 0.52), which crushed
+the reds' available chroma — hearts natively sits at L 0.616 where far more
+chroma exists. Result read muted. Regenerated: lightness now sits in a BAND
+(0.52–0.58) with FULL chroma per hue. Clubs at max chroma is exactly the
+original `#008851`; hearts comes back as vivid `#e50026`, close to the
+original but passing the AA floor the original failed.
+
 ### Measured results (rendered pixels, not predictions)
 
-| | white text | vs felt |
-|---|---|---|
-| spades `oklch(0.52 0 89.9)` | 5.49:1 | 3.71:1 |
-| clubs `oklch(0.52 0.112 156.7)` | 5.18:1 | 3.51:1 |
-| hearts `oklch(0.52 0.19 25)` | 6.08:1 | 4.12:1 |
-| diamonds `oklch(0.52 0.241 266.1)` | 5.96:1 | 4.03:1 |
+| | value | white text | vs felt |
+|---|---|---|---|
+| spades | `oklch(0.52 0 89.9)` `#696969` | 5.49:1 | 3.71:1 |
+| clubs | `oklch(0.55 0.132 156.7)` `#008851` | 4.53:1 | 3.06:1 |
+| hearts | `oklch(0.58 0.235 25)` `#e50026` | 4.82:1 | 3.26:1 |
+| diamonds | `oklch(0.555 0.245 266.1)` `#305dff` | 5.08:1 | 3.44:1 |
+
+### State tokens placed in the palette
+
+`--to-act` was Tailwind's amber-400 converted numerically but never retuned —
+the source of the stray yellow. State tokens now hold deliberate places:
+to-act shares the accent hue (70.1), hero shares the clubs hue (156.7),
+leader shares the grade-D hue (55).
+
+### Dark mode block: intentional
+
+The `@media (prefers-color-scheme: dark)` background/foreground switch is
+deliberate: the site follows the OS theme and there is no in-app toggle. If a
+toggle ever lands, that block becomes the default the toggle overrides.
 
 Grades A–F sweep hue 155° → 25° at constant L and chroma %, measuring
 5.20–6.08:1 on white text — one graduated ramp rather than five unrelated

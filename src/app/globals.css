@@ -26,11 +26,17 @@
   --background: #ffffff;
   --foreground: #171717;
 
-  /* Card suits — L 0.52, C = 90% of each hue's sRGB max. */
+  /* Card suits.
+     Lightness sits in a BAND (0.52-0.58), not one value: forcing all four to
+     one L crushed the reds' available chroma and the set went muted. Each
+     suit keeps its native character with FULL chroma for its hue (clubs at
+     max chroma is exactly the original #008851), clamped only enough that
+     white text clears WCAG AA on every suit — which the original hearts
+     (#ED3038, 4.13:1) did not. */
   --suit-spades: #696969;
-  --suit-clubs: #1f7c4e;
-  --suit-hearts: #be222a;
-  --suit-diamonds: #2951f0;
+  --suit-clubs: #008851;
+  --suit-hearts: #e50026;
+  --suit-diamonds: #305dff;
 
   /* Grade scale — one L, one chroma %, hue sweeps green -> red.
      Only hue carries the good/bad meaning, so A-F reads as one ramp. */
@@ -56,9 +62,13 @@
   --accent: #f4a434;
   --accent-fg: #171717;
   --accent-text: #8e5d1a;
-  --to-act: #fbbf24;
-  --hero: #34d399;
-  --leader: #b45309;
+  /* State tokens are placed IN the palette, not inherited from Tailwind:
+     to-act shares the accent's hue (70.1) so the action glow and the accent
+     read as one family; hero shares the clubs hue (156.7); leader shares the
+     grade-D hue (55) for "currently winning" text on light cards. */
+  --to-act: #fabd75;
+  --hero: #3bd388;
+  --leader: #a95c1d;
 }
 
 @supports (color: oklch(0 0 0)) {
@@ -67,9 +77,9 @@
     --foreground: oklch(0.205 0 0);
 
     --suit-spades: oklch(0.52 0 89.9);
-    --suit-clubs: oklch(0.52 0.112 156.7);
-    --suit-hearts: oklch(0.52 0.19 25);
-    --suit-diamonds: oklch(0.52 0.241 266.1);
+    --suit-clubs: oklch(0.55 0.132 156.7);
+    --suit-hearts: oklch(0.58 0.235 25);
+    --suit-diamonds: oklch(0.555 0.245 266.1);
 
     --grade-a: oklch(0.52 0.116 155);
     --grade-b: oklch(0.52 0.122 128);
@@ -87,9 +97,9 @@
     --accent: oklch(0.78 0.152 70.1);
     --accent-fg: oklch(0.205 0 0);
     --accent-text: oklch(0.52 0.101 70.1);
-    --to-act: oklch(0.837 0.164 84.4);
-    --hero: oklch(0.773 0.153 163.2);
-    --leader: oklch(0.555 0.132 55);
+    --to-act: oklch(0.84 0.114 70.1);
+    --hero: oklch(0.77 0.166 156.7);
+    --leader: oklch(0.555 0.124 55);
   }
 }
 
