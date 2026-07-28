@@ -18,7 +18,7 @@ import {
 } from '@/engine/betting';
 import { useEquity } from '@/hooks/useEquity';
 import { positionLabels } from '@/lib/positions';
-import { CardBadge } from '@/components/CardBadge';
+import { TrainerCard } from "@/components/TrainerCard";
 import { CardPickerSheet } from '@/components/CardPickerSheet';
 
 type Slot =
@@ -252,7 +252,7 @@ export default function Home() {
                   onClick={() => changePlayerCount(n)}
                   className={`px-2.5 py-1 rounded-lg text-sm font-medium border ${
                     playerCount === n
-                      ? 'bg-accent border-accent text-white'
+                      ? 'bg-accent border-accent text-accent-fg'
                       : 'border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                   }`}
                 >
@@ -271,7 +271,7 @@ export default function Home() {
                   onClick={() => changeVariant(v)}
                   className={`px-3 py-1 text-sm font-medium ${
                     variant === v
-                      ? 'bg-accent text-white'
+                      ? 'bg-accent text-accent-fg'
                       : 'bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800'
                   }`}
                 >
@@ -291,7 +291,7 @@ export default function Home() {
                   onClick={() => setDoubleBoard(opt.value)}
                   className={`px-3 py-1 text-sm font-medium ${
                     doubleBoard === opt.value
-                      ? 'bg-accent text-white'
+                      ? 'bg-accent text-accent-fg'
                       : 'bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800'
                   }`}
                 >
@@ -310,7 +310,7 @@ export default function Home() {
                 onClick={() => setAnte(a)}
                 className={`px-2.5 py-1 rounded-lg text-sm font-medium border ${
                   ante === a
-                    ? 'bg-accent border-accent text-white'
+                    ? 'bg-accent border-accent text-accent-fg'
                     : 'border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                 }`}
               >
@@ -324,18 +324,18 @@ export default function Home() {
         </section>
 
         {/* Boards */}
-        <section className="rounded-xl bg-emerald-900/90 dark:bg-emerald-950 text-white p-3 flex flex-col gap-3">
+        <section className="rounded-xl bg-felt border-4 border-rail text-zinc-900 p-3 flex flex-col gap-3">
           {Array.from({ length: nBoards }, (_, b) => (
             <div key={b} className="flex items-center gap-2">
-              <span className="w-14 text-xs font-medium text-emerald-200 shrink-0">
+              <span className="w-14 text-xs font-medium text-zinc-700 shrink-0">
                 Board {b + 1}
               </span>
               <div className="flex gap-1.5 flex-1">
                 {boards[b].map((card, i) => (
-                  <CardBadge
+                  <TrainerCard
                     key={i}
                     card={card}
-                    fluid
+                    size="fluid"
                     active={picker?.kind === 'board' && picker.board === b && picker.index === i}
                     onClick={() => setPicker({ kind: 'board', board: b, index: i })}
                   />
@@ -347,13 +347,13 @@ export default function Home() {
             <button
               type="button"
               onClick={dealStreet}
-              className="w-full text-sm px-3 py-2 rounded-lg bg-emerald-800 hover:bg-emerald-700 text-emerald-100 font-medium"
+              className="w-full text-sm px-3 py-2 rounded-lg bg-accent hover:bg-accent/85 text-accent-fg font-semibold"
             >
               Deal {nextStreet}
             </button>
           )}
           {!equityEnabled && (
-            <p className="text-xs text-emerald-200/80">
+            <p className="text-xs text-zinc-700">
               {completePlayers.length < 2
                 ? 'Enter at least two complete hands to see equity.'
                 : 'Boards need 0, 3, 4, or 5 cards (no gaps) for equity.'}
@@ -377,7 +377,7 @@ export default function Home() {
                 </div>
                 <div className="flex gap-1">
                   {hand.map((card, i) => (
-                    <CardBadge
+                    <TrainerCard
                       key={i}
                       card={card}
                       size="sm"
@@ -470,7 +470,7 @@ export default function Home() {
                 onClick={() => setBetFraction(f)}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium border ${
                   betFraction === f
-                    ? 'bg-accent border-accent text-white'
+                    ? 'bg-accent border-accent text-accent-fg'
                     : 'border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                 }`}
               >
@@ -534,7 +534,7 @@ export default function Home() {
             <button
               type="button"
               onClick={dealHands}
-              className="flex-1 py-2 rounded-lg bg-accent hover:bg-accent/85 text-white font-semibold text-sm"
+              className="flex-1 py-2 rounded-lg bg-accent hover:bg-accent/85 text-accent-fg font-semibold text-sm"
             >
               Deal hands
             </button>

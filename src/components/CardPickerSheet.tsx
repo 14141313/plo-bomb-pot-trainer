@@ -8,7 +8,7 @@
 
 import type { Card } from '@/engine/cards';
 import { RANKS, makeCard } from '@/engine/cards';
-import { suitSymbol, suitTextClass } from './CardBadge';
+import { suitBgClass, suitSymbol, suitTextClass } from './TrainerCard';
 
 interface CardPickerSheetProps {
   /** Every card currently placed anywhere on the table. */
@@ -74,11 +74,14 @@ export function CardPickerSheet({
                     type="button"
                     disabled={used}
                     onClick={() => onPick(card)}
-                    className={`h-10 sm:h-9 min-w-0 rounded text-xs sm:text-sm font-semibold transition-colors
+                    /* Filled suit colour, matching the cards themselves. The
+                       row's suit symbol keeps the grid unambiguous even
+                       though the cells carry no glyph. */
+                    className={`h-10 sm:h-9 min-w-0 rounded text-xs sm:text-sm font-bold transition-opacity
                       ${
                         used
                           ? 'bg-zinc-200 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-600 cursor-not-allowed'
-                          : `bg-zinc-50 dark:bg-zinc-800 hover:bg-amber-100 dark:hover:bg-amber-900 ${suitTextClass(suit)} border border-zinc-200 dark:border-zinc-700`
+                          : `${suitBgClass(suit)} text-white hover:opacity-80`
                       }`}
                   >
                     {RANKS[rank]}

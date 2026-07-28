@@ -48,11 +48,16 @@
   --card-back: #334155;
   --card-back-edge: #64748b;
 
-  /* State */
-  --accent: #f59e0b;
+  /* State.
+     --accent is a BRIGHT fill, so it pairs with a dark on-colour, never
+     white: white on this yellow measures 2.14:1, well under the 4.5:1 floor.
+     --accent-text is the mid-lightness variant for accent-coloured text and
+     borders, which must work on both the light and dark page background. */
+  --accent: #f4a434;
+  --accent-fg: #171717;
+  --accent-text: #8e5d1a;
   --to-act: #fbbf24;
   --hero: #34d399;
-  /* Darker than --accent: this one sits as text on a light background. */
   --leader: #b45309;
 }
 
@@ -79,7 +84,9 @@
     --card-back: oklch(0.372 0.039 257.3);
     --card-back-edge: oklch(0.554 0.041 257.4);
 
-    --accent: oklch(0.769 0.165 70.1);
+    --accent: oklch(0.78 0.152 70.1);
+    --accent-fg: oklch(0.205 0 0);
+    --accent-text: oklch(0.52 0.101 70.1);
     --to-act: oklch(0.837 0.164 84.4);
     --hero: oklch(0.773 0.153 163.2);
     --leader: oklch(0.555 0.132 55);
@@ -123,6 +130,8 @@
   --color-card-back-edge: var(--card-back-edge);
 
   --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-text: var(--accent-text);
   --color-to-act: var(--to-act);
   --color-hero: var(--hero);
   --color-leader: var(--leader);

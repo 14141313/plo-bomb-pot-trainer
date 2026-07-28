@@ -158,6 +158,37 @@ Grades A–F sweep hue 155° → 25° at constant L and chroma %, measuring
 5.20–6.08:1 on white text — one graduated ramp rather than five unrelated
 colours.
 
+### One card component, one system, across both tabs
+
+`CardBadge` (white card, coloured text, suit glyph) was deleted. `TrainerCard`
+is now the single playing card for the whole app and handles the empty and
+interactive states, so the Tool's card entry and the Trainer's dealt cards are
+literally the same component rather than two lookalikes. The Tool's board also
+moved from green felt to the shared `--felt` / `--rail` tokens, and the card
+picker's cells are filled suit colours — the grid keeps one row per suit with a
+symbol header, so dropping the per-cell glyph stays unambiguous.
+
+### Accent retune, and a contrast bug it exposed
+
+`--accent` was Tailwind's `amber-500` behind a new name, which is why the first
+OKLCH pass looked like nothing had changed — it was a token migration, not a
+restyle. Retuning it surfaced a real bug: every accent button was
+`bg-accent text-white`, and **white on that yellow measures 2.06:1**, far under
+the 4.5:1 floor. It had been that way since the first build.
+
+A bright accent needs a dark on-colour, so the token set is now:
+
+| Token | Use | Contrast |
+| --- | --- | --- |
+| `--accent` `oklch(0.78 0.152 70.1)` | bright fill | 8.71:1 with `--accent-fg` |
+| `--accent-fg` `oklch(0.205 0 0)` | text/icons on `--accent` | — |
+| `--accent-text` `oklch(0.52 0.101 70.1)` | accent text and borders | 5.6:1 on white, 4.4:1 on the dark chrome |
+
+`--accent-text` exists because the nav's active state is accent-coloured text
+sitting on the page background, which is white in light mode and near-black in
+dark mode. The bright fill fails on white (1.9:1); the mid-lightness variant
+clears both.
+
 ### Decisions on the brief's open questions
 
 - **Uniform suit lightness: yes.** It also fixed a real bug — the old hearts

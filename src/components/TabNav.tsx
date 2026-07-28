@@ -25,7 +25,7 @@ export function TabNav() {
               href={tab.href}
               className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${
                 active
-                  ? 'border-accent text-accent'
+                  ? 'border-accent text-accent-text'
                   : 'border-transparent text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
               }`}
             >

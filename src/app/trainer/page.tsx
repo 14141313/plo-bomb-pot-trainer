@@ -271,7 +271,7 @@ export default function TrainerPage() {
                   type="button"
                   onClick={() => setConfig((c) => ({ ...c, variant: v }))}
                   className={`px-3 py-1 font-medium ${
-                    config.variant === v ? 'bg-accent text-white' : 'bg-transparent'
+                    config.variant === v ? 'bg-accent text-accent-fg' : 'bg-transparent'
                   }`}
                 >
                   PLO{v}
@@ -288,7 +288,7 @@ export default function TrainerPage() {
                   type="button"
                   onClick={() => setConfig((c) => ({ ...c, doubleBoard: o.value }))}
                   className={`px-3 py-1 font-medium ${
-                    config.doubleBoard === o.value ? 'bg-accent text-white' : 'bg-transparent'
+                    config.doubleBoard === o.value ? 'bg-accent text-accent-fg' : 'bg-transparent'
                   }`}
                 >
                   {o.label}
@@ -305,7 +305,7 @@ export default function TrainerPage() {
                 onClick={() => setConfig((c) => ({ ...c, ante: a }))}
                 className={`px-2.5 py-1 rounded-lg font-medium border ${
                   config.ante === a
-                    ? 'bg-accent border-accent text-white'
+                    ? 'bg-accent border-accent text-accent-fg'
                     : 'border-zinc-300 dark:border-zinc-700'
                 }`}
               >
@@ -316,7 +316,7 @@ export default function TrainerPage() {
           <button
             type="button"
             onClick={startHand}
-            className="mt-1 w-full py-2.5 rounded-lg bg-accent hover:bg-accent/85 text-white font-semibold"
+            className="mt-1 w-full py-2.5 rounded-lg bg-accent hover:bg-accent/85 text-accent-fg font-semibold"
           >
             Deal hand
           </button>
@@ -425,7 +425,7 @@ export default function TrainerPage() {
               <button
                 type="button"
                 onClick={startHand}
-                className="w-full py-2.5 rounded-lg bg-accent hover:bg-accent/85 text-white font-semibold"
+                className="w-full py-2.5 rounded-lg bg-accent hover:bg-accent/85 text-accent-fg font-semibold"
               >
                 Next hand
               </button>
