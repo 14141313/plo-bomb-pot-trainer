@@ -272,6 +272,9 @@ function closeStreet(s: HandState): HandState {
   s.committed = Array(s.config.playerCount).fill(0);
   s.acted = Array(s.config.playerCount).fill(false);
   s.toAct = nextToAct({ ...s, acted: s.acted, committed: s.committed }, -1);
+  // Nobody can act — everyone still in is all-in. Run the remaining streets
+  // out to showdown rather than stalling with no one to act.
+  if (s.toAct === null) return closeStreet(s);
   return s;
 }
 

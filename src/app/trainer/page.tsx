@@ -10,7 +10,8 @@
  */
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { CardBadge } from '@/components/CardBadge';
+import { ActionBar } from '@/components/ActionBar';
+import { PokerTable, type SeatView } from '@/components/PokerTable';
 import { useEquity } from '@/hooks/useEquity';
 import { ANTE_PRESETS } from '@/engine/betting';
 import { continueProbability } from '@/engine/opponent';
@@ -48,6 +49,13 @@ interface CompletedHand {
   evLoss: number;
 }
 
+/**
+ * The trainer table is laid out for a fixed ring for now — a precise oval
+ * beats a layout that has to stretch from 2 to 8 seats. The Tool tab keeps
+ * variable player counts.
+ */
+export const TRAINER_PLAYER_COUNT = 7;
+
 const GRADE_STYLE: Record<Grade, string> = {
   A: 'bg-emerald-600 text-white',
   B: 'bg-lime-600 text-white',
@@ -64,7 +72,7 @@ function GradePill({ grade }: { grade: Grade }) {
 
 export default function TrainerPage() {
   const [config, setConfig] = useState<HandConfig>({
-    playerCount: 4,
+    playerCount: TRAINER_PLAYER_COUNT,
     variant: 4,
     ante: 6,
     doubleBoard: true,
@@ -207,6 +215,30 @@ export default function TrainerPage() {
     if (next.complete) recordSession(next, nextEntries);
   }
 
+  /**
+   * Seats for the table graphic. Opponent cards are passed only once the hand
+   * is over — revealing them at their seat, the way a real showdown works,
+   * rather than in a separate list.
+   */
+  const seatViews: SeatView[] = useMemo(() => {
+    if (!hand) return [];
+    const btnSeat = labels.indexOf('BTN');
+    return hand.hands.map((cards, seat) => ({
+      seat,
+      label: labels[seat],
+      stack: hand.stacks[seat],
+      committed: hand.committed[seat],
+      folded: hand.folded[seat],
+      isHero: seat === hand.heroSeat,
+      isDealer: seat === btnSeat,
+      toAct: hand.toAct === seat && !hand.complete,
+      // Real showdown convention: only hands that got there are turned over.
+      // Mucked hands stay down, which also keeps 7 seats of cards legible.
+      cards:
+        seat === hand.heroSeat || (hand.complete && !hand.folded[seat]) ? cards : null,
+    }));
+  }, [hand, labels]);
+
   const sessionGrade = averageGrade(
     session.flatMap((h) => h.entries.map((e) => e.grade)),
   );
@@ -218,22 +250,8 @@ export default function TrainerPage() {
 
       {!hand && (
         <section className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-3 flex flex-col gap-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <span>Players</span>
-            {[4, 5, 6, 7, 8].map((n) => (
-              <button
-                key={n}
-                type="button"
-                onClick={() => setConfig((c) => ({ ...c, playerCount: n }))}
-                className={`px-2.5 py-1 rounded-lg font-medium border ${
-                  config.playerCount === n
-                    ? 'bg-amber-500 border-amber-500 text-white'
-                    : 'border-zinc-300 dark:border-zinc-700'
-                }`}
-              >
-                {n}
-              </button>
-            ))}
+          <div className="text-xs text-zinc-500">
+            Trainer is fixed at {TRAINER_PLAYER_COUNT}-handed for now.
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <div className="flex rounded-lg overflow-hidden border border-zinc-300 dark:border-zinc-700">
@@ -297,55 +315,32 @@ export default function TrainerPage() {
 
       {hand && (
         <>
-          <section className="rounded-xl bg-emerald-950 border border-emerald-900 p-3 flex flex-col gap-2">
-            <div className="flex items-center justify-between text-xs text-emerald-200">
-              <span>
-                {hand.street.toUpperCase()} · pot {hand.pot.toFixed(1)}bb
-              </span>
-              <span>
-                You are {labels[hand.heroSeat]} · {hand.stacks[hand.heroSeat].toFixed(1)}bb behind
-              </span>
-            </div>
-            {hand.boards.map((board, b) => (
-              <div key={b} className="flex items-center gap-2">
-                <span className="w-14 text-xs text-emerald-200 shrink-0">Board {b + 1}</span>
-                <div className="flex gap-1.5 flex-1">
-                  {board.map((c, i) => (
-                    <CardBadge key={i} card={c} fluid />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </section>
+          <PokerTable
+            seats={seatViews}
+            pot={hand.pot}
+            heroSeat={hand.heroSeat}
+            boards={hand.boards}
+          />
 
-          <section className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-3">
-            <div className="text-xs text-zinc-500 mb-2">Your hand</div>
-            <div className="flex gap-1.5">
-              {hand.hands[hand.heroSeat].map((c, i) => (
-                <CardBadge key={i} card={c} />
-              ))}
-            </div>
+          <div className="flex items-center justify-between text-xs text-zinc-500">
+            <span>{hand.street.toUpperCase()}</span>
             {/* Equity is the answer to the question being asked, so it is
                 never shown while a decision is open — including the moment a
                 new street is dealt and opponents act before the hero. */}
             {heroEquity && !heroTurn && (hand.complete || actedOn === hand.street) && (
-              <div className="mt-2 text-xs text-zinc-500">
-                Equity {(heroEquity.combined * 100).toFixed(1)}% combined
+              <span>
+                Equity {(heroEquity.combined * 100).toFixed(1)}%
                 {hand.boards.length > 1 && (
-                  <>
-                    {' '}
-                    ({heroEquity.perBoard.map((e) => `${(e * 100).toFixed(1)}%`).join(' / ')} per
-                    board)
-                  </>
+                  <> ({heroEquity.perBoard.map((e) => `${(e * 100).toFixed(1)}%`).join(' / ')})</>
                 )}
-              </div>
+              </span>
             )}
-          </section>
+          </div>
 
           {!hand.complete && (
-            <section className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-3">
+            <section>
               {!heroTurn && (
-                <div className="text-zinc-500 text-xs">
+                <div className="text-zinc-500 text-xs py-3 text-center">
                   {running || !equities ? 'Calculating equity…' : 'Opponents acting…'}
                 </div>
               )}
@@ -356,51 +351,14 @@ export default function TrainerPage() {
                       ? `Facing ${scored.toCall.toFixed(1)}bb into ${hand.pot.toFixed(1)}bb`
                       : 'Checked to you'}
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    {scored.toCall > 0 ? (
-                      <>
-                        <button
-                          type="button"
-                          onClick={() => act('fold', 0)}
-                          className="px-3 py-2 rounded-lg bg-zinc-700 text-white font-medium"
-                        >
-                          Fold
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => act('call', scored.toCall)}
-                          className="px-3 py-2 rounded-lg bg-emerald-700 text-white font-medium"
-                        >
-                          Call {scored.toCall.toFixed(1)}bb
-                        </button>
-                      </>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => act('check', 0)}
-                        className="px-3 py-2 rounded-lg bg-zinc-700 text-white font-medium"
-                      >
-                        Check
-                      </button>
-                    )}
-                    {scored.sizings.map((s) => (
-                      <button
-                        key={`${s.kind}-${s.fraction}-${s.amount}`}
-                        type="button"
-                        onClick={() => act(s.kind, s.amount, s.fraction)}
-                        className="px-3 py-2 rounded-lg bg-amber-500 text-white font-medium"
-                      >
-                        {s.allIn ? (
-                          <>All-in {s.amount.toFixed(1)}bb</>
-                        ) : (
-                          <>
-                            {s.kind === 'bet' ? 'Bet' : 'Raise to'} {s.amount.toFixed(1)}bb
-                            <span className="opacity-70 text-xs"> ({s.fraction * 100}%)</span>
-                          </>
-                        )}
-                      </button>
-                    ))}
-                  </div>
+                  <ActionBar
+                    toCall={scored.toCall}
+                    sizings={scored.sizings}
+                    onFold={() => act('fold', 0)}
+                    onCheck={() => act('check', 0)}
+                    onCall={() => act('call', scored.toCall)}
+                    onSize={(s) => act(s.kind, s.amount, s.fraction)}
+                  />
                 </>
               )}
             </section>
@@ -410,27 +368,9 @@ export default function TrainerPage() {
             <section className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-3 flex flex-col gap-3">
               <div className="font-semibold">Hand review</div>
 
-              <div>
-                <div className="text-xs text-zinc-500 mb-1">
-                  Opponent hands (revealed now the hand is over)
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  {hand.hands.map((cards, seat) =>
-                    seat === hand.heroSeat ? null : (
-                      <div key={seat} className="flex items-center gap-2">
-                        <span className="w-14 text-xs shrink-0">{labels[seat]}</span>
-                        <div className="flex gap-1">
-                          {cards.map((c, i) => (
-                            <CardBadge key={i} card={c} size="sm" />
-                          ))}
-                        </div>
-                        {hand.folded[seat] && (
-                          <span className="text-xs text-zinc-500">folded</span>
-                        )}
-                      </div>
-                    ),
-                  )}
-                </div>
+              <div className="text-xs text-zinc-500">
+                Hands that reached showdown are revealed at their seats above;
+                folded hands are mucked.
               </div>
 
               <div className="flex flex-col gap-2">

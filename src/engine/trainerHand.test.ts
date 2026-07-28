@@ -181,6 +181,28 @@ describe('street progression', () => {
     expect(s.showdownSeats.length).toBeGreaterThan(1);
   });
 
+  it('runs the board out to showdown when everyone left is all-in', () => {
+    // Regression: with no one able to act, the hand used to stall forever
+    // with toAct null and complete false instead of reaching showdown.
+    let s = dealHand(config, mulberry32(40));
+    s = { ...s, stacks: s.stacks.map(() => 0), committed: s.committed.map(() => 0) };
+    // Close the flop betting with every player all-in.
+    let guard = 0;
+    while (!s.complete && s.toAct !== null && guard++ < 20) s = applyAction(s, 'check', 0);
+    expect(s.complete).toBe(true);
+    expect(s.street).toBe('river');
+    for (const b of s.boards) expect(b).toHaveLength(5);
+    expect(s.showdownSeats.length).toBeGreaterThan(1);
+  });
+
+  it('never leaves the hand with nobody to act and no result', () => {
+    for (let seed = 0; seed < 40; seed++) {
+      const s0 = dealHand(config, mulberry32(seed));
+      const s = advanceToHero(s0, evenEquities(4), mulberry32(seed));
+      expect(s.complete || s.toAct !== null).toBe(true);
+    }
+  });
+
   it('is reproducible from the same seed', () => {
     const run = () => {
       let s = dealHand(config, mulberry32(99));
