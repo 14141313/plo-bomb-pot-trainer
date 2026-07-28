@@ -73,11 +73,11 @@ export default function TrainerPage() {
   const [entries, setEntries] = useState<ReviewEntry[]>([]);
   const [session, setSession] = useState<CompletedHand[]>([]);
   /**
-   * Equity is the answer to the question being asked, so it stays hidden
-   * while a hand is live. Revealing is deliberate and resets every street,
-   * so peeking is always an explicit choice rather than a default.
+   * The street on which the hero last acted. Equity is revealed only for that
+   * street, and only while the hero has no pending decision — so it appears
+   * right after an action but never before one, on any street.
    */
-  const [peeked, setPeeked] = useState(false);
+  const [actedOn, setActedOn] = useState<Street | null>(null);
 
   const labels = positionLabels(config.playerCount);
 
@@ -146,7 +146,7 @@ export default function TrainerPage() {
   const startHand = useCallback(() => {
     setHand(dealHand(config, () => Math.random()));
     setEntries([]);
-    setPeeked(false);
+    setActedOn(null);
   }, [config]);
 
   const heroEquity = hand && equities ? equities[hand.heroSeat] : null;
@@ -201,9 +201,9 @@ export default function TrainerPage() {
       ];
       setEntries(nextEntries);
     }
+    setActedOn(hand.street);
     const next = applyAction(hand, kind, amount, fraction);
     setHand(next);
-    setPeeked(false); // re-hide for the next decision
     if (next.complete) recordSession(next, nextEntries);
   }
 
@@ -325,27 +325,21 @@ export default function TrainerPage() {
                 <CardBadge key={i} card={c} />
               ))}
             </div>
-            {heroEquity &&
-              (hand.complete || peeked ? (
-                <div className="mt-2 text-xs text-zinc-500">
-                  Equity {(heroEquity.combined * 100).toFixed(1)}% combined
-                  {hand.boards.length > 1 && (
-                    <>
-                      {' '}
-                      ({heroEquity.perBoard.map((e) => `${(e * 100).toFixed(1)}%`).join(' / ')} per
-                      board)
-                    </>
-                  )}
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setPeeked(true)}
-                  className="mt-2 text-xs text-zinc-500 underline underline-offset-2 hover:text-zinc-300"
-                >
-                  Show equity
-                </button>
-              ))}
+            {/* Equity is the answer to the question being asked, so it is
+                never shown while a decision is open — including the moment a
+                new street is dealt and opponents act before the hero. */}
+            {heroEquity && !heroTurn && (hand.complete || actedOn === hand.street) && (
+              <div className="mt-2 text-xs text-zinc-500">
+                Equity {(heroEquity.combined * 100).toFixed(1)}% combined
+                {hand.boards.length > 1 && (
+                  <>
+                    {' '}
+                    ({heroEquity.perBoard.map((e) => `${(e * 100).toFixed(1)}%`).join(' / ')} per
+                    board)
+                  </>
+                )}
+              </div>
+            )}
           </section>
 
           {!hand.complete && (
