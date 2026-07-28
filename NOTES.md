@@ -92,6 +92,42 @@ and **Trainer** (`/trainer`). `/` redirects to `/tool`.
 - All-in was offered when illegal (pot-limit has no overbet) and when it
   merely covered the call.
 
+## Equity engine validation
+
+`src/engine/validation.test.ts` exists because the poker maths can't be
+eyeballed — a subtly wrong evaluator still returns plausible percentages. It
+leans on internal consistency rather than published equity tables, which
+disagree with each other by ~9 points for the same matchup:
+
+- **Independent reference evaluator.** A deliberately naive best-2-from-hole /
+  best-3-from-board loop, written separately from the optimised path, must
+  agree over 4,000 random PLO4 and PLO5 hands. It also asserts the
+  combination count (60 for PLO4, 100 for PLO5), which catches the classic
+  bug of letting 1 or 3 hole cards slip through.
+- **Convergence.** Monte Carlo at the shipped iteration count must land within
+  1pp of exact enumeration on a spot that is an exact 50/50 — sampling error
+  peaks at p = 0.5, so a lopsided spot would pass trivially and prove nothing.
+- **Double-board maths.** Equities sum to 100% overall and per board, and
+  combined equals the mean of the two per-board figures under the 50/50 split.
+- **Regression fixtures** with fully determined outcomes, plus rainbow-board,
+  flush-over-flush and chopped-pot edge cases.
+
+### Findings
+
+- **Trainer iteration count raised 10k → 20k.** On the 50/50 fixture, 10k
+  produced errors up to 1.24pp across seeds — outside the 1pp bar, and the
+  trainer's grades read off these numbers. 20k measures 0.63pp worst case.
+  Both surfaces now use `DEFAULT_ITERATIONS`.
+- **AAKK double-suited vs random**, 8 opponents × 15k iterations, averages
+  **70.8%** (range 64.7–78.0 by opponent). Published sources span ~64–73%, so
+  this is asserted as a range, never a single number.
+- `forceMonteCarlo` was added to `EquityOptions` purely so tests can run both
+  methods over the same scenario. Production never sets it.
+- Note: the external reference used two *independently dealt* boards. This
+  engine deals both from one shared deck, so runouts are correlated and a card
+  on board 1 cannot repeat on board 2 — the correct behaviour for a real bomb
+  pot, and a deliberate difference from that reference.
+
 ## Queued next
 
 1. **Supabase** (blocked on project creation + keys): magic-link auth gating

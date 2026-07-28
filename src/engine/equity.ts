@@ -38,6 +38,12 @@ export interface EquityOptions {
   boardShares?: readonly number[];
   /** RNG seed for reproducible simulations. */
   seed?: number;
+  /**
+   * Force Monte Carlo even when the spot is small enough to enumerate.
+   * Exists so tests can run both methods over the SAME scenario and check
+   * they converge; production never sets it.
+   */
+  forceMonteCarlo?: boolean;
 }
 
 export interface BoardEquity {
@@ -182,7 +188,10 @@ export function calculateEquity(opts: EquityOptions): EquityResult {
   let samples = 0;
   let method: 'exact' | 'monte-carlo';
 
-  if (countOutcomes(remaining.length, missing) <= MAX_ENUMERATION_OUTCOMES) {
+  if (
+    !opts.forceMonteCarlo &&
+    countOutcomes(remaining.length, missing) <= MAX_ENUMERATION_OUTCOMES
+  ) {
     method = 'exact';
     // Enumerate joint runouts: choose missing cards for board 0, then board 1
     // from what's left. Recursion depth is tiny (≤ 2 boards).

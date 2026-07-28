@@ -14,6 +14,7 @@ import { ActionBar } from '@/components/ActionBar';
 import { PokerTable, type SeatView } from '@/components/PokerTable';
 import { useEquity } from '@/hooks/useEquity';
 import { ANTE_PRESETS } from '@/engine/betting';
+import { DEFAULT_ITERATIONS } from '@/engine/equity';
 import { continueProbability } from '@/engine/opponent';
 import { positionLabels } from '@/lib/positions';
 import {
@@ -99,7 +100,10 @@ export default function TrainerPage() {
       players: hand ? live.map((i) => hand.hands[i]) : [],
       boards: hand ? hand.boards : [],
       enabled: hand !== null && !hand.complete && live.length >= 2,
-      iterations: 10_000,
+      // 20k, not 10k: at a genuinely 50/50 spot the sampling error at 10k
+      // reaches ~1.2pp, which misses the 1pp accuracy bar the equity engine
+      // is validated against. Scoring reads off these numbers.
+      iterations: DEFAULT_ITERATIONS,
     }),
     [hand, live],
   );
