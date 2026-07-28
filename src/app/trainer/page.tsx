@@ -72,6 +72,12 @@ export default function TrainerPage() {
   const [hand, setHand] = useState<HandState | null>(null);
   const [entries, setEntries] = useState<ReviewEntry[]>([]);
   const [session, setSession] = useState<CompletedHand[]>([]);
+  /**
+   * Equity is the answer to the question being asked, so it stays hidden
+   * while a hand is live. Revealing is deliberate and resets every street,
+   * so peeking is always an explicit choice rather than a default.
+   */
+  const [peeked, setPeeked] = useState(false);
 
   const labels = positionLabels(config.playerCount);
 
@@ -140,6 +146,7 @@ export default function TrainerPage() {
   const startHand = useCallback(() => {
     setHand(dealHand(config, () => Math.random()));
     setEntries([]);
+    setPeeked(false);
   }, [config]);
 
   const heroEquity = hand && equities ? equities[hand.heroSeat] : null;
@@ -196,6 +203,7 @@ export default function TrainerPage() {
     }
     const next = applyAction(hand, kind, amount, fraction);
     setHand(next);
+    setPeeked(false); // re-hide for the next decision
     if (next.complete) recordSession(next, nextEntries);
   }
 
@@ -317,18 +325,27 @@ export default function TrainerPage() {
                 <CardBadge key={i} card={c} />
               ))}
             </div>
-            {heroEquity && (
-              <div className="mt-2 text-xs text-zinc-500">
-                Equity {(heroEquity.combined * 100).toFixed(1)}% combined
-                {hand.boards.length > 1 && (
-                  <>
-                    {' '}
-                    ({heroEquity.perBoard.map((e) => `${(e * 100).toFixed(1)}%`).join(' / ')} per
-                    board)
-                  </>
-                )}
-              </div>
-            )}
+            {heroEquity &&
+              (hand.complete || peeked ? (
+                <div className="mt-2 text-xs text-zinc-500">
+                  Equity {(heroEquity.combined * 100).toFixed(1)}% combined
+                  {hand.boards.length > 1 && (
+                    <>
+                      {' '}
+                      ({heroEquity.perBoard.map((e) => `${(e * 100).toFixed(1)}%`).join(' / ')} per
+                      board)
+                    </>
+                  )}
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setPeeked(true)}
+                  className="mt-2 text-xs text-zinc-500 underline underline-offset-2 hover:text-zinc-300"
+                >
+                  Show equity
+                </button>
+              ))}
           </section>
 
           {!hand.complete && (
