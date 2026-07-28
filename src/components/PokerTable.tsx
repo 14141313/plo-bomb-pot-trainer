@@ -5,10 +5,11 @@
  * dealt — standard poker-client convention — with the other seats rotated
  * around them in action order.
  *
- * Felt colour: a light neutral, NOT green and NOT dark. The four-colour deck
- * spans dark grey (#494949), green (#008851), red (#ED3038) and blue
- * (#345FED); a green felt killed the clubs and a dark felt would kill the
- * spades the same way. Only a light neutral contrasts with all four.
+ * Felt colour: a light neutral, NOT green and NOT dark. The four suits sit at
+ * one lightness (L 0.52) across grey, green, red and blue; a green felt killed
+ * the clubs and a dark felt would kill the spades the same way. Only a light
+ * neutral separates from all four — measured 3.5:1 to 4.1:1 against each.
+ * All colour tokens live in globals.css.
  */
 
 import type { Card } from '@/engine/cards';
@@ -101,7 +102,7 @@ function CardBacks() {
       {[0, 1].map((i) => (
         <span
           key={i}
-          className="w-3 h-4 rounded-[2px] bg-slate-700 border border-slate-500"
+          className="w-3 h-4 rounded-[2px] bg-card-back border border-card-back-edge"
         />
       ))}
     </div>
@@ -120,7 +121,7 @@ export function PokerTable({ seats, pot, heroSeat, boards, inHand }: PokerTableP
   return (
     <div className="relative w-full max-w-[420px] aspect-[4/5] mx-auto">
       {/* Felt */}
-      <div className="absolute inset-x-[13%] inset-y-[5%] rounded-full bg-zinc-300 border-[6px] border-zinc-700 shadow-inner" />
+      <div className="absolute inset-x-[13%] inset-y-[5%] rounded-full bg-felt border-[6px] border-rail shadow-inner" />
 
       {/* Boards and pot. Sized so a full double board (5 + 5) still fits. */}
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 pointer-events-none">
@@ -161,16 +162,16 @@ export function PokerTable({ seats, pot, heroSeat, boards, inHand }: PokerTableP
               <div
                 className={`flex flex-col items-center rounded border px-1.5 py-0.5 leading-tight ${
                   s.folded
-                    ? 'border-zinc-600 bg-zinc-800 opacity-45'
-                    : 'border-zinc-500 bg-zinc-900'
+                    ? 'border-seat-border/60 bg-seat opacity-45'
+                    : 'border-seat-border bg-seat'
                 } ${
                   // Mutually exclusive: two ring-* utilities would collide and
                   // whichever CSS rule happened to win would hide the other.
                   // Whose turn it is always outranks the "this is you" marker.
                   s.toAct
-                    ? 'ring-4 ring-amber-400 shadow-lg shadow-amber-400/50'
+                    ? 'ring-4 ring-to-act shadow-lg shadow-to-act/50'
                     : s.isHero
-                      ? 'ring-2 ring-emerald-400'
+                      ? 'ring-2 ring-hero'
                       : ''
                 }`}
               >

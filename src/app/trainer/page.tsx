@@ -57,12 +57,18 @@ interface CompletedHand {
  */
 export const TRAINER_PLAYER_COUNT = 7;
 
+/**
+ * One lightness and one chroma percentage across all five, with only the hue
+ * sweeping green -> red. That makes A-F read as a single graduated scale
+ * rather than five unrelated colours, and keeps white text legible at every
+ * step (measured 5.2:1 to 6.1:1).
+ */
 const GRADE_STYLE: Record<Grade, string> = {
-  A: 'bg-emerald-600 text-white',
-  B: 'bg-lime-600 text-white',
-  C: 'bg-amber-500 text-white',
-  D: 'bg-orange-600 text-white',
-  F: 'bg-red-600 text-white',
+  A: 'bg-grade-a text-white',
+  B: 'bg-grade-b text-white',
+  C: 'bg-grade-c text-white',
+  D: 'bg-grade-d text-white',
+  F: 'bg-grade-f text-white',
 };
 
 function GradePill({ grade }: { grade: Grade }) {
@@ -265,7 +271,7 @@ export default function TrainerPage() {
                   type="button"
                   onClick={() => setConfig((c) => ({ ...c, variant: v }))}
                   className={`px-3 py-1 font-medium ${
-                    config.variant === v ? 'bg-amber-500 text-white' : 'bg-transparent'
+                    config.variant === v ? 'bg-accent text-white' : 'bg-transparent'
                   }`}
                 >
                   PLO{v}
@@ -282,7 +288,7 @@ export default function TrainerPage() {
                   type="button"
                   onClick={() => setConfig((c) => ({ ...c, doubleBoard: o.value }))}
                   className={`px-3 py-1 font-medium ${
-                    config.doubleBoard === o.value ? 'bg-amber-500 text-white' : 'bg-transparent'
+                    config.doubleBoard === o.value ? 'bg-accent text-white' : 'bg-transparent'
                   }`}
                 >
                   {o.label}
@@ -299,7 +305,7 @@ export default function TrainerPage() {
                 onClick={() => setConfig((c) => ({ ...c, ante: a }))}
                 className={`px-2.5 py-1 rounded-lg font-medium border ${
                   config.ante === a
-                    ? 'bg-amber-500 border-amber-500 text-white'
+                    ? 'bg-accent border-accent text-white'
                     : 'border-zinc-300 dark:border-zinc-700'
                 }`}
               >
@@ -310,7 +316,7 @@ export default function TrainerPage() {
           <button
             type="button"
             onClick={startHand}
-            className="mt-1 w-full py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-white font-semibold"
+            className="mt-1 w-full py-2.5 rounded-lg bg-accent hover:bg-accent/85 text-white font-semibold"
           >
             Deal hand
           </button>
@@ -397,7 +403,7 @@ export default function TrainerPage() {
                       {e.chosen.ev.toFixed(2)}bb)
                     </div>
                     {e.evLoss > 0 ? (
-                      <div className="text-amber-500">
+                      <div className="text-accent">
                         Best was {e.best.kind}
                         {e.best.amount > 0 ? ` ${e.best.amount.toFixed(1)}bb` : ''} (EV{' '}
                         {e.best.ev.toFixed(2)}bb) — cost {e.evLoss.toFixed(2)}bb
@@ -417,7 +423,7 @@ export default function TrainerPage() {
               <button
                 type="button"
                 onClick={startHand}
-                className="w-full py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-white font-semibold"
+                className="w-full py-2.5 rounded-lg bg-accent hover:bg-accent/85 text-white font-semibold"
               >
                 Next hand
               </button>

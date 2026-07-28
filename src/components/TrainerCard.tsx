@@ -9,10 +9,19 @@
 
 import { RANKS, rankOf, suitOf, type Card } from '@/engine/cards';
 
-/** Suit colours, indexed to match SUITS = 'cdhs' in engine/cards. */
-export const SUIT_COLORS = ['#008851', '#345FED', '#ED3038', '#494949'] as const;
+/**
+ * Suit background classes, indexed to match SUITS = 'cdhs' in engine/cards.
+ * The values live in globals.css as OKLCH tokens — all four share one
+ * lightness so no suit reads as brighter than another.
+ */
+const SUIT_BG = [
+  'bg-suit-clubs',
+  'bg-suit-diamonds',
+  'bg-suit-hearts',
+  'bg-suit-spades',
+] as const;
 
-export const suitColor = (card: Card): string => SUIT_COLORS[suitOf(card)];
+export const suitClass = (card: Card): string => SUIT_BG[suitOf(card)];
 
 const SIZES = {
   xs: 'w-4 h-6 text-[10px] rounded-sm',
@@ -36,8 +45,7 @@ export function TrainerCard({ card, size = 'md' }: TrainerCardProps) {
   return (
     <div
       aria-label={`${RANKS[rankOf(card)]}${'cdhs'[suitOf(card)]}`}
-      className={`${SIZES[size]} flex items-center justify-center font-bold text-white shadow-sm select-none`}
-      style={{ backgroundColor: suitColor(card) }}
+      className={`${SIZES[size]} ${suitClass(card)} flex items-center justify-center font-bold text-white shadow-sm select-none`}
     >
       {RANKS[rankOf(card)]}
     </div>

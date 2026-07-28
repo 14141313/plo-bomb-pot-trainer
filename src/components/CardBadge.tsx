@@ -4,10 +4,15 @@ import type { Card } from '@/engine/cards';
 import { RANKS, rankOf, suitOf } from '@/engine/cards';
 
 /** Four-color deck for fast reading: spades black, hearts red, diamonds blue, clubs green. */
+/**
+ * Same four suit hues as the Trainer's filled cards, applied as text here.
+ * Sharing the tokens keeps a heart the same hue in both tabs; the Tool shows
+ * suit symbols too, so colour is reinforcing rather than load-bearing.
+ */
 const SUIT_META = [
-  { symbol: '♣', text: 'text-emerald-600', selectedBg: 'bg-emerald-50 dark:bg-emerald-950' },
-  { symbol: '♦', text: 'text-blue-600', selectedBg: 'bg-blue-50 dark:bg-blue-950' },
-  { symbol: '♥', text: 'text-red-600', selectedBg: 'bg-red-50 dark:bg-red-950' },
+  { symbol: '♣', text: 'text-suit-clubs', selectedBg: 'bg-emerald-50 dark:bg-emerald-950' },
+  { symbol: '♦', text: 'text-suit-diamonds', selectedBg: 'bg-blue-50 dark:bg-blue-950' },
+  { symbol: '♥', text: 'text-suit-hearts', selectedBg: 'bg-red-50 dark:bg-red-950' },
   { symbol: '♠', text: 'text-zinc-900 dark:text-zinc-100', selectedBg: 'bg-zinc-100 dark:bg-zinc-800' },
 ] as const;
 

@@ -1,15 +1,89 @@
 @import "tailwindcss";
 
+/* ===========================================================================
+   Colour tokens — OKLCH, single source of truth.
+   ===========================================================================
+
+   Every colour lives here so the palette is one coordinated system rather
+   than hex codes picked per component. Two rules hold it together:
+
+   1. UNIFORM LIGHTNESS. Colours meant to read as a set share an L value, so
+      they look equally bright. The suits previously spanned L 0.405..0.616,
+      which is why they felt like four unrelated colours.
+   2. EQUAL CHROMA PERCENTAGE, not equal chroma. Max chroma varies a lot by
+      hue (at L=0.52: blue tops out ~0.268, green only ~0.124). Using one
+      absolute C would leave green washed out and blue screaming. Each hue
+      instead sits at 90% of its own maximum, so they're equally vivid and
+      all comfortably inside sRGB.
+
+   Hex fallbacks come first and @supports upgrades to OKLCH, so nothing
+   breaks on browsers without oklch(). @theme inline reads the vars, so
+   Tailwind utilities inherit the whole fallback chain.
+   ------------------------------------------------------------------------ */
+
 :root {
+  /* Page chrome */
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Card suits — L 0.52, C = 90% of each hue's sRGB max. */
+  --suit-spades: #696969;
+  --suit-clubs: #1f7c4e;
+  --suit-hearts: #be222a;
+  --suit-diamonds: #2951f0;
+
+  /* Grade scale — one L, one chroma %, hue sweeps green -> red.
+     Only hue carries the good/bad meaning, so A-F reads as one ramp. */
+  --grade-a: #1e7c4a;
+  --grade-b: #54751a;
+  --grade-c: #7a681a;
+  --grade-d: #9a541a;
+  --grade-f: #be222a;
+
+  /* Table */
+  --felt: #d4d4d8;
+  --rail: #3f3f46;
+  --seat: #18181b;
+  --seat-border: #71717a;
+  --card-back: #334155;
+  --card-back-edge: #64748b;
+
+  /* State */
+  --accent: #f59e0b;
+  --to-act: #fbbf24;
+  --hero: #34d399;
+  /* Darker than --accent: this one sits as text on a light background. */
+  --leader: #b45309;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@supports (color: oklch(0 0 0)) {
+  :root {
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.205 0 0);
+
+    --suit-spades: oklch(0.52 0 89.9);
+    --suit-clubs: oklch(0.52 0.112 156.7);
+    --suit-hearts: oklch(0.52 0.19 25);
+    --suit-diamonds: oklch(0.52 0.241 266.1);
+
+    --grade-a: oklch(0.52 0.116 155);
+    --grade-b: oklch(0.52 0.122 128);
+    --grade-c: oklch(0.52 0.096 95);
+    --grade-d: oklch(0.52 0.116 55);
+    --grade-f: oklch(0.52 0.19 25);
+
+    --felt: oklch(0.871 0.005 286.3);
+    --rail: oklch(0.37 0.012 285.8);
+    --seat: oklch(0.21 0.006 285.9);
+    --seat-border: oklch(0.552 0.014 285.9);
+    --card-back: oklch(0.372 0.039 257.3);
+    --card-back-edge: oklch(0.554 0.041 257.4);
+
+    --accent: oklch(0.769 0.165 70.1);
+    --to-act: oklch(0.837 0.164 84.4);
+    --hero: oklch(0.773 0.153 163.2);
+    --leader: oklch(0.555 0.132 55);
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -17,6 +91,44 @@
     --background: #0a0a0a;
     --foreground: #ededed;
   }
+
+  @supports (color: oklch(0 0 0)) {
+    :root {
+      --background: oklch(0.145 0 0);
+      --foreground: oklch(0.946 0 0);
+    }
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-suit-spades: var(--suit-spades);
+  --color-suit-clubs: var(--suit-clubs);
+  --color-suit-hearts: var(--suit-hearts);
+  --color-suit-diamonds: var(--suit-diamonds);
+
+  --color-grade-a: var(--grade-a);
+  --color-grade-b: var(--grade-b);
+  --color-grade-c: var(--grade-c);
+  --color-grade-d: var(--grade-d);
+  --color-grade-f: var(--grade-f);
+
+  --color-felt: var(--felt);
+  --color-rail: var(--rail);
+  --color-seat: var(--seat);
+  --color-seat-border: var(--seat-border);
+  --color-card-back: var(--card-back);
+  --color-card-back-edge: var(--card-back-edge);
+
+  --color-accent: var(--accent);
+  --color-to-act: var(--to-act);
+  --color-hero: var(--hero);
+  --color-leader: var(--leader);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
 }
 
 body {

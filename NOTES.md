@@ -128,6 +128,56 @@ disagree with each other by ~9 points for the same matchup:
   on board 1 cannot repeat on board 2 — the correct behaviour for a real bomb
   pot, and a deliberate difference from that reference.
 
+## Colour system (OKLCH)
+
+All colour lives in `src/app/globals.css` as OKLCH tokens with hex fallbacks
+behind `@supports`, exposed to Tailwind v4 via `@theme inline` so utilities
+inherit the fallback chain. Converted with the `oklch-skill` agent skill
+(`.agents/skills/oklch-skill`, markdown-only — no scripts or network calls).
+
+Two rules hold the palette together:
+
+- **Uniform lightness** for anything meant to read as a set. The suits
+  previously spanned L 0.405–0.616, which is why they felt like four unrelated
+  colours; they now all sit at L 0.52.
+- **Equal chroma *percentage*, not equal chroma.** Max chroma varies hugely by
+  hue (at L 0.52: blue peaks ~0.268, green only ~0.124). One absolute C would
+  leave green washed out and blue shouting. Each hue sits at 90% of its own
+  sRGB maximum.
+
+### Measured results (rendered pixels, not predictions)
+
+| | white text | vs felt |
+|---|---|---|
+| spades `oklch(0.52 0 89.9)` | 5.49:1 | 3.71:1 |
+| clubs `oklch(0.52 0.112 156.7)` | 5.18:1 | 3.51:1 |
+| hearts `oklch(0.52 0.19 25)` | 6.08:1 | 4.12:1 |
+| diamonds `oklch(0.52 0.241 266.1)` | 5.96:1 | 4.03:1 |
+
+Grades A–F sweep hue 155° → 25° at constant L and chroma %, measuring
+5.20–6.08:1 on white text — one graduated ramp rather than five unrelated
+colours.
+
+### Decisions on the brief's open questions
+
+- **Uniform suit lightness: yes.** It also fixed a real bug — the old hearts
+  `#ED3038` measured **4.13:1** on white text, below the WCAG AA 4.5:1 floor.
+  Every suit now passes.
+- **Scope: whole app.** Suit hues are shared with the Tool tab's card text so a
+  heart is the same hue in both tabs; Tool chrome otherwise untouched.
+- **Display P3: not used.** Suit identity is load-bearing in a trainer, and P3
+  would make the same suit look different on different displays. Everything is
+  held inside sRGB deliberately.
+- **Action buttons: NOT colour-coded** — see below.
+
+### Action bar conflict, unresolved
+
+The brief asks for a coordinated fold/check/call/bet/raise colour set. That
+directly contradicts the later instruction to make the action bar neutral
+(white stroke, white text) so the tool doesn't nudge a decision it is about to
+grade. The neutral bar was kept and the colour-coding was **not** reintroduced.
+Flag if the brief should win.
+
 ## Queued next
 
 1. **Supabase** (blocked on project creation + keys): magic-link auth gating

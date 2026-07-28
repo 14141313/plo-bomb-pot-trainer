@@ -252,7 +252,7 @@ export default function Home() {
                   onClick={() => changePlayerCount(n)}
                   className={`px-2.5 py-1 rounded-lg text-sm font-medium border ${
                     playerCount === n
-                      ? 'bg-amber-500 border-amber-500 text-white'
+                      ? 'bg-accent border-accent text-white'
                       : 'border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                   }`}
                 >
@@ -271,7 +271,7 @@ export default function Home() {
                   onClick={() => changeVariant(v)}
                   className={`px-3 py-1 text-sm font-medium ${
                     variant === v
-                      ? 'bg-amber-500 text-white'
+                      ? 'bg-accent text-white'
                       : 'bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800'
                   }`}
                 >
@@ -291,7 +291,7 @@ export default function Home() {
                   onClick={() => setDoubleBoard(opt.value)}
                   className={`px-3 py-1 text-sm font-medium ${
                     doubleBoard === opt.value
-                      ? 'bg-amber-500 text-white'
+                      ? 'bg-accent text-white'
                       : 'bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800'
                   }`}
                 >
@@ -310,7 +310,7 @@ export default function Home() {
                 onClick={() => setAnte(a)}
                 className={`px-2.5 py-1 rounded-lg text-sm font-medium border ${
                   ante === a
-                    ? 'bg-amber-500 border-amber-500 text-white'
+                    ? 'bg-accent border-accent text-white'
                     : 'border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                 }`}
               >
@@ -391,10 +391,10 @@ export default function Home() {
                     {doubleBoard ? (
                       <>
                         <div>
-                          <div className={leaders[0] === resultIdx ? 'font-bold text-amber-600' : ''}>
+                          <div className={leaders[0] === resultIdx ? 'font-bold text-leader' : ''}>
                             B1 {pct(pe.perBoard[0].equity)}
                           </div>
-                          <div className={leaders[1] === resultIdx ? 'font-bold text-amber-600' : ''}>
+                          <div className={leaders[1] === resultIdx ? 'font-bold text-leader' : ''}>
                             B2 {pct(pe.perBoard[1]?.equity ?? 0)}
                           </div>
                         </div>
@@ -407,7 +407,7 @@ export default function Home() {
                       </>
                     ) : (
                       <div
-                        className={`text-base font-bold ${leaders[0] === resultIdx ? 'text-amber-600' : ''}`}
+                        className={`text-base font-bold ${leaders[0] === resultIdx ? 'text-leader' : ''}`}
                       >
                         {pct(pe.combined)}
                       </div>
@@ -426,7 +426,7 @@ export default function Home() {
               <>
                 <span className="inline-block w-24 h-1.5 rounded bg-zinc-200 dark:bg-zinc-800 overflow-hidden">
                   <span
-                    className="block h-full bg-amber-500 transition-all"
+                    className="block h-full bg-accent transition-all"
                     style={{ width: `${progress * 100}%` }}
                   />
                 </span>
@@ -468,7 +468,7 @@ export default function Home() {
                 onClick={() => setBetFraction(f)}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium border ${
                   betFraction === f
-                    ? 'bg-amber-500 border-amber-500 text-white'
+                    ? 'bg-accent border-accent text-white'
                     : 'border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                 }`}
               >
@@ -532,7 +532,7 @@ export default function Home() {
             <button
               type="button"
               onClick={dealHands}
-              className="flex-1 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-semibold text-sm"
+              className="flex-1 py-2 rounded-lg bg-accent hover:bg-accent/85 text-white font-semibold text-sm"
             >
               Deal hands
             </button>
