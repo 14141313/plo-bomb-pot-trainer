@@ -19,6 +19,12 @@ const SIZES = {
   sm: 'w-6 h-8 text-sm rounded',
   md: 'w-9 h-12 text-xl rounded-md',
   lg: 'w-12 h-16 text-3xl rounded-lg',
+  /**
+   * Community and hero cards share this size. Sized so a FULL double board
+   * (five per row) fits the felt, not just a three-card flop — otherwise the
+   * cards would have to shrink when the turn and river land.
+   */
+  table: 'w-9 h-12 text-xl rounded-md sm:w-11 sm:h-[3.85rem] sm:text-2xl',
 } as const;
 
 interface TrainerCardProps {

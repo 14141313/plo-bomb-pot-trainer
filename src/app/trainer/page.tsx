@@ -320,6 +320,7 @@ export default function TrainerPage() {
             pot={hand.pot}
             heroSeat={hand.heroSeat}
             boards={hand.boards}
+            inHand={!hand.complete}
           />
 
           <div className="flex items-center justify-between text-xs text-zinc-500">
