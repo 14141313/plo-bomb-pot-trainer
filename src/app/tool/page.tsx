@@ -362,7 +362,7 @@ export default function Home() {
         </section>
 
         {/* Players */}
-        <section className="flex flex-col gap-2">
+        <section className="nums flex flex-col gap-2">
           {hands.map((hand, p) => {
             const resultIdx = completePlayers.findIndex((cp) => cp.index === p);
             const pe = resultIdx >= 0 && liveResult ? liveResult.players[resultIdx] : null;
@@ -455,7 +455,9 @@ export default function Home() {
                 min={0}
                 value={pot}
                 onChange={(e) => setPotOverride(Number(e.target.value))}
-                className="w-16 rounded border border-zinc-300 dark:border-zinc-700 bg-transparent px-1 py-0.5 text-right"
+                /* text-base on mobile: iOS Safari zooms the whole page when an
+                   input's text is under 16px. */
+                className="nums w-16 rounded border border-zinc-300 dark:border-zinc-700 bg-transparent px-1 py-0.5 text-right text-base sm:text-xs"
               />
               bb
             </label>

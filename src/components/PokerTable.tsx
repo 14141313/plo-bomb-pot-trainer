@@ -119,7 +119,7 @@ export function PokerTable({ seats, pot, heroSeat, boards, inHand }: PokerTableP
   });
 
   return (
-    <div className="relative w-full max-w-[420px] aspect-[4/5] mx-auto">
+    <div className="nums relative w-full max-w-[420px] aspect-[4/5] mx-auto">
       {/* Felt */}
       <div className="absolute inset-x-[13%] inset-y-[5%] rounded-full bg-felt border-[6px] border-rail shadow-inner" />
 

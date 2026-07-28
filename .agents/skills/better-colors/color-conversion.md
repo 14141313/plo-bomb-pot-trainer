@@ -1,6 +1,6 @@
 # Color Conversion
 
-When converting existing colors to oklch, convert the color values but leave everything else unchanged — don't change gradient interpolation, don't restructure the CSS.
+Use this reference only when the user asks for conversion, the project is already standardizing on OKLCH, or an agreed color-system migration requires it. Do not convert an isolated value in a project that intentionally uses another notation. When conversion is in scope, convert the color values but leave everything else unchanged: don't change gradient interpolation or restructure the CSS.
 
 ## Supported input formats
 
@@ -39,15 +39,15 @@ Alpha uses the forward-slash syntax. Omit alpha when it's 1.
 ## What to leave alone
 
 - CSS keywords: `currentColor`, `inherit`, `initial`, `unset`, `transparent`
-- Gradient interpolation methods — only convert the color stops, not the function itself
+- Gradient interpolation methods: only convert the color stops, not the function itself
 - Colors in third-party library configs that expect hex input
 
 ## Bulk conversion
 
-When converting an entire file:
+Bulk conversion is a migration task, not routine cleanup. When an entire file is explicitly in scope:
 
 1. Replace all hex colors with their oklch equivalents
 2. Replace all `rgb()`, `rgba()`, `hsl()`, `hsla()` function calls
-3. Leave gradient functions unchanged — only convert the color stops within them
+3. Leave gradient functions unchanged; only convert the color stops within them
 4. Leave `currentColor`, `inherit`, `transparent`, and CSS keywords as-is
 5. Preserve comments and formatting

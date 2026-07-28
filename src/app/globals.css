@@ -134,5 +134,18 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  /* Geist is loaded in layout.tsx; this used to hard-code Arial, so the font
+     was downloaded and then thrown away. */
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/*
+ * Tabular figures for anything that changes: stacks, pot, bet sizes, equity,
+ * EV. Proportional digits have different widths, so a stack ticking 94 -> 83.5
+ * would shift everything around it on every update. Scoped to numeric surfaces
+ * rather than the whole body, since prose reads better with proportional
+ * digits.
+ */
+.nums {
+  font-variant-numeric: tabular-nums;
 }

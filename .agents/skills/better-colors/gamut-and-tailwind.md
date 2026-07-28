@@ -99,5 +99,5 @@ Tailwind's opacity modifier syntax works with oklch:
 
 1. Convert all hex values in `@theme` to oklch
 2. Replace any `theme()` references that used hex
-3. Test dark mode — oklch values may look slightly different due to perceptual accuracy
+3. Test dark mode: oklch values may look slightly different due to perceptual accuracy
 4. Check for hardcoded hex in component code and convert those too

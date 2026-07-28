@@ -170,6 +170,30 @@ colours.
   held inside sRGB deliberately.
 - **Action buttons: NOT colour-coded** — see below.
 
+## Typography pass
+
+Ran against `better-typography` from the `jakubkrehel/skills` suite
+(`.agents/skills/`, markdown + agent configs — no scripts or network calls).
+The standalone `oklch-skill` was removed, since the suite's `better-colors`
+supersedes it.
+
+Two genuine bugs, both live in production before this:
+
+- **Geist was downloaded and then thrown away.** `globals.css` hard-coded
+  `font-family: Arial, Helvetica, sans-serif` on `body`, overriding the Geist
+  variable font loaded in `layout.tsx`. Verified on the deployed site — it was
+  rendering Arial while paying for Geist.
+- **The pot input on the Tool tab was 12px**, so iOS Safari zooms the whole
+  page when it's focused. Now `text-base sm:text-xs`. Matters for a tool meant
+  to be used one-handed at a table.
+
+Plus tabular figures (`.nums` in globals.css) on every changing value —
+stacks, pot, chips, bet sizes, equity, EV. Proportional digits have different
+widths, so a stack ticking 94 → 83.5 shifted its neighbours on every update.
+Measured after: all ten digits are exactly 9.6px.
+
+Hit areas were audited and already pass — no target under 24×24.
+
 ### Action bar conflict, unresolved
 
 The brief asks for a coordinated fold/check/call/bet/raise colour set. That

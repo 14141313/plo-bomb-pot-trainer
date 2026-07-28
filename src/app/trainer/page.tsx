@@ -334,12 +334,14 @@ export default function TrainerPage() {
           />
 
           <div className="flex items-center justify-between text-xs text-zinc-500">
-            <span>{hand.street.toUpperCase()}</span>
+            {/* Natural case in the data, presentation in CSS, so copy never
+                has to be rewritten for a restyle. */}
+            <span className="uppercase tracking-wide">{hand.street}</span>
             {/* Equity is the answer to the question being asked, so it is
                 never shown while a decision is open — including the moment a
                 new street is dealt and opponents act before the hero. */}
             {heroEquity && !heroTurn && (hand.complete || actedOn === hand.street) && (
-              <span>
+              <span className="nums">
                 Equity {(heroEquity.combined * 100).toFixed(1)}%
                 {hand.boards.length > 1 && (
                   <> ({heroEquity.perBoard.map((e) => `${(e * 100).toFixed(1)}%`).join(' / ')})</>
@@ -388,12 +390,12 @@ export default function TrainerPage() {
                 {entries.map((e, i) => (
                   <div
                     key={i}
-                    className="rounded-lg border border-zinc-200 dark:border-zinc-800 p-2 text-xs flex flex-col gap-1"
+                    className="nums rounded-lg border border-zinc-200 dark:border-zinc-800 p-2 text-xs flex flex-col gap-1"
                   >
                     <div className="flex items-center gap-2">
                       <GradePill grade={e.grade} />
-                      <span className="uppercase text-zinc-500">{e.street}</span>
-                      <span className="ml-auto text-zinc-500">
+                      <span className="uppercase tracking-wide text-zinc-500">{e.street}</span>
+                      <span className="ml-auto text-zinc-500 nums">
                         {(e.equity * 100).toFixed(1)}% equity · pot {e.pot.toFixed(1)}bb
                       </span>
                     </div>
@@ -440,7 +442,7 @@ export default function TrainerPage() {
       )}
 
       {session.length > 0 && (
-        <section className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-3">
+        <section className="nums rounded-xl border border-zinc-200 dark:border-zinc-800 p-3">
           <div className="flex items-center gap-2 mb-2">
             <span className="font-semibold">Session</span>
             {sessionGrade && <GradePill grade={sessionGrade} />}

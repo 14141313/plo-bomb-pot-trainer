@@ -48,7 +48,7 @@ function ActionButton({
 export function ActionBar({ toCall, sizings, onFold, onCheck, onCall, onSize }: ActionBarProps) {
   const facing = toCall > 0;
   return (
-    <div className="flex gap-1.5">
+    <div className="nums flex gap-1.5">
       {facing ? (
         <>
           <ActionButton label="Fold" onClick={onFold} />
