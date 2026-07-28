@@ -73,6 +73,27 @@ export function classifyTier(view: OpponentView, rng: () => number): Tier {
   return 'weak';
 }
 
+/**
+ * Probability this opponent continues (calls or raises) against a bet.
+ *
+ * Used by the scorer to estimate the EV of hero's bets and raises. It mirrors
+ * the tier logic in `decideAction` but returns a smooth probability instead of
+ * sampling one action, so EV estimates don't jitter between renders.
+ */
+export function continueProbability(view: OpponentView): number {
+  if (view.toCall <= 0) return 1;
+  const price = view.toCall / (view.pot + view.toCall);
+  const fairShare = 1 / view.livePlayers;
+  let ratio = view.combined / fairShare;
+  if (view.perBoard.some((e) => e >= BOARD_LOCK_EQUITY)) ratio *= 1.2;
+
+  if (ratio >= TIER_THRESHOLDS.strong) return 1;
+  if (view.combined < price) return ratio >= TIER_THRESHOLDS.good ? 0.15 : 0.02;
+  // Priced in: how comfortably decides how often they continue.
+  const margin = (view.combined - price) / Math.max(price, 1e-6);
+  return Math.min(0.95, 0.5 + margin);
+}
+
 /** Pick one of the allowed pot fractions, weighted toward `centre`. */
 function pickFraction(centre: number, rng: () => number): number {
   const idx = BET_FRACTIONS.indexOf(centre as (typeof BET_FRACTIONS)[number]);
