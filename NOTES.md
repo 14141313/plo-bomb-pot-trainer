@@ -55,17 +55,52 @@ opponent logic, no Review mode yet.
   use); the suggested "fix" downgrades Next to 9.x, so it's ignored until a
   Next patch absorbs it.
 
-## Queued for Phase 2 (after sign-off)
+## Phase 2 — Trainer (built)
 
-1. **Train**: opponent dealing (hidden hands), heuristic equity-tier
-   decision logic with per-tier sizing from the same preset list,
-   randomization within tiers, per-board equity blending for
-   ahead-on-one/behind-on-other spots, action flow street by street,
-   fold-review feedback (equity at fold vs price faced, per board).
+Site is now two tabs: **Tool** (`/tool`, open access, unchanged from Phase 1)
+and **Trainer** (`/trainer`). `/` redirects to `/tool`.
+
+### Decisions locked in
+
+- **Combined equity drives all scoring**, not per-board. There is one pot, so
+  the EV of a call depends on your total expected share of it. Being 90% on
+  one board and 10% on the other is exactly a 50% call. Per-board figures are
+  still displayed, because they explain *why* a decision is right.
+- **Grades normalize EV loss to pot size** (`GRADE_BANDS` in `scoring.ts`):
+  A ≤2% of pot, B ≤5%, C ≤10%, D ≤20%, F above. Raw bb would grade a 3bb
+  error in a 24bb pot the same as in a 200bb pot.
+- **"Optimal" means best response to this tool's opponent model, not GTO.**
+  Solved multi-way double-board PLO doesn't meaningfully exist; the UI and
+  `scoring.ts` say so rather than implying a solver.
+- **Scoring uses single-decision lookahead.** Fold and call EVs are exact;
+  bet and raise EVs depend on modelled opponent fold/call responses. Future
+  streets of betting are not modelled.
+- **Opponent tiers are ratios to an equal pot share**, not raw equity, so one
+  set of thresholds works from 4- to 8-handed. A board locked up (≥85% on one
+  board) bumps the tier: half a pot that can't be lost supports more
+  aggression than combined equity alone implies.
+- **Auth: magic link** (chosen by user). Scoped to `/trainer` only.
+
+### Bugs found by playing hands, now regression-tested
+
+- Pot-limit raise cap double-counted the outstanding bet: `HandState.pot` is a
+  running total including the current street, `PotState.pot` means completed
+  streets only.
+- Equity was computed across *all* seats including folded players, diluting
+  every share and understating the live opponents — which in turn made the
+  scorer think bets always got through.
+- All-in was offered when illegal (pot-limit has no overbet) and when it
+  merely covered the call.
+
+## Queued next
+
+1. **Supabase** (blocked on project creation + keys): magic-link auth gating
+   `/trainer`, `profiles` / `hands` / `hand_actions` tables with RLS, persisted
+   hand history and session stats. Session stats currently live in memory and
+   reset on reload.
 2. **Review**: manual hand entry reusing the Phase 1 components, street-by-
    street replay against the equity engine.
-3. Polish: equity bar charts, position-aware action order enforcement,
-   multiway pot odds refinement, PLO5 picker ergonomics.
+3. Polish: equity bar charts, hand-history filtering, PLO5 picker ergonomics.
 
 ## Running it
 
