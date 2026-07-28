@@ -1,16 +1,13 @@
 /**
- * Bottom action bar. Only legal actions appear, and colour encodes the action
- * TYPE so the choice is readable at a glance during a live decision:
+ * Bottom action bar. Only legal actions appear.
  *
- *   fold  = blue      (give up)
- *   check = slate     (pass, costs nothing)
- *   call  = green     (match, costs chips)
- *   bet / raise = red (aggression, deepening with size)
+ * Every action is styled identically — white stroke, white text, no fill —
+ * deliberately. Colour-coding an action (red for a big bet, green for a call)
+ * reads as the tool having an opinion, and this trainer must not hint at the
+ * answer it is about to grade. Same reason equity stays hidden until you act.
  *
- * Sizing layout: the passive actions get their own row, and every legal sizing
- * preset sits in a compact wrapping grid below. With at most five sizes this
- * fits without scrolling on a phone, and no size is hidden behind a picker —
- * the tool should never make one sizing harder to choose than another.
+ * All actions share ONE row so nothing sits above anything else in the
+ * hierarchy: check and the sizings are peers, not a primary and a secondary.
  */
 
 import type { Sizing } from '@/engine/trainerHand';
@@ -24,67 +21,52 @@ interface ActionBarProps {
   onSize: (s: Sizing) => void;
 }
 
-/** Aggression shades: bigger commitment reads hotter. */
-const SIZE_SHADES = ['bg-rose-500', 'bg-rose-600', 'bg-red-600', 'bg-red-700'];
+const BUTTON =
+  'flex-1 min-w-0 px-1 py-2 rounded-lg border border-white/70 bg-transparent ' +
+  'text-white font-semibold hover:bg-white/10 active:bg-white/20 transition-colors';
+
+/** Label + optional bb amount underneath, on a fixed two-line frame. */
+function ActionButton({
+  label,
+  amount,
+  onClick,
+}: {
+  label: string;
+  amount?: number;
+  onClick: () => void;
+}) {
+  return (
+    <button type="button" onClick={onClick} className={BUTTON}>
+      <span className="block text-sm leading-tight">{label}</span>
+      <span className="block text-[11px] font-normal leading-tight opacity-75">
+        {amount === undefined ? ' ' : amount.toFixed(1)}
+      </span>
+    </button>
+  );
+}
 
 export function ActionBar({ toCall, sizings, onFold, onCheck, onCall, onSize }: ActionBarProps) {
   const facing = toCall > 0;
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex gap-2">
-        {facing ? (
-          <>
-            <button
-              type="button"
-              onClick={onFold}
-              className="flex-1 py-3 rounded-lg bg-blue-500 hover:bg-blue-400 text-white font-semibold"
-            >
-              Fold
-            </button>
-            <button
-              type="button"
-              onClick={onCall}
-              className="flex-1 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold"
-            >
-              Call {toCall.toFixed(1)}
-            </button>
-          </>
-        ) : (
-          <button
-            type="button"
-            onClick={onCheck}
-            className="flex-1 py-3 rounded-lg bg-slate-600 hover:bg-slate-500 text-white font-semibold"
-          >
-            Check
-          </button>
-        )}
-      </div>
-
-      {sizings.length > 0 && (
-        <div className="grid grid-cols-3 gap-2">
-          {sizings.map((s, i) => (
-            <button
-              key={`${s.kind}-${s.fraction}-${s.amount}`}
-              type="button"
-              onClick={() => onSize(s)}
-              className={`py-2.5 rounded-lg text-white font-semibold text-sm ${
-                s.allIn ? 'bg-red-800 hover:bg-red-700' : SIZE_SHADES[Math.min(i, 3)]
-              }`}
-            >
-              {s.allIn ? (
-                'All-in'
-              ) : (
-                <>
-                  {s.fraction * 100}%
-                  <span className="block text-[11px] font-normal opacity-80">
-                    {s.amount.toFixed(1)}
-                  </span>
-                </>
-              )}
-            </button>
-          ))}
-        </div>
+    <div className="flex gap-1.5">
+      {facing ? (
+        <>
+          <ActionButton label="Fold" onClick={onFold} />
+          <ActionButton label="Call" amount={toCall} onClick={onCall} />
+        </>
+      ) : (
+        <ActionButton label="Check" onClick={onCheck} />
       )}
+      {sizings.map((s) => (
+        <ActionButton
+          key={`${s.kind}-${s.fraction}-${s.amount}`}
+          // B for a bet, R for a raise — the distinction matters in poker and
+          // colour is no longer available to carry it.
+          label={s.allIn ? 'All in' : `${s.kind === 'bet' ? 'B' : 'R'}${s.fraction * 100}`}
+          amount={s.amount}
+          onClick={() => onSize(s)}
+        />
+      ))}
     </div>
   );
 }

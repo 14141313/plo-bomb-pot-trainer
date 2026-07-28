@@ -128,7 +128,6 @@ export function PokerTable({ seats, pot, heroSeat, boards }: PokerTableProps) {
           return { x: pos.x + (dx / len) * distance, y: pos.y + (dy / len) * distance };
         };
         const chip = inward(19);
-        const button = inward(9);
         return (
           <div key={s.seat}>
             {/* Seat */}
@@ -152,22 +151,19 @@ export function PokerTable({ seats, pot, heroSeat, boards }: PokerTableProps) {
                   s.toAct ? 'ring-2 ring-amber-400' : ''
                 }`}
               >
+                {s.isDealer && (
+                  <span className="flex items-center pl-1">
+                    <span className="w-3.5 h-3.5 rounded-full bg-white text-zinc-900 text-[9px] font-bold flex items-center justify-center">
+                      D
+                    </span>
+                  </span>
+                )}
                 <span className="px-1.5 py-1 font-semibold text-white">{s.label}</span>
                 <span className="px-1.5 py-1 text-zinc-300 border-l border-zinc-700">
                   {s.stack.toFixed(s.stack % 1 === 0 ? 0 : 1)}
                 </span>
               </div>
             </div>
-
-            {/* Dealer button */}
-            {s.isDealer && (
-              <div
-                className="absolute -translate-x-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white text-zinc-900 text-[10px] font-bold flex items-center justify-center shadow"
-                style={{ left: `${button.x}%`, top: `${button.y}%` }}
-              >
-                D
-              </div>
-            )}
 
             {/* Chips committed this street */}
             {s.committed > 0 && (
