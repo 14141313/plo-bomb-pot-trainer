@@ -32,18 +32,53 @@ interface PokerTableProps {
   boards: ReadonlyArray<readonly Card[]>;
 }
 
+/** Half-width and half-height of the seat ring, as percentages of the box. */
+const A = 37;
+const B = 45;
+/** Length of the straight section on each side of the stadium. */
+const H = B - A;
+
 /**
- * Seat coordinates as percentages of the table box. Index 0 is bottom centre
- * (the hero); the rest walk evenly around the ellipse.
+ * Seat coordinates as percentages of the table box.
+ *
+ * The felt is a STADIUM (straight sides, semicircular caps), not an ellipse,
+ * so seats are spaced by arc length around that perimeter — an ellipse
+ * parametrisation would drift off the straight sections. Index 0 is bottom
+ * centre (the hero); the rest walk evenly counter-clockwise.
  */
 function seatPositions(count: number): Array<{ x: number; y: number }> {
-  // Kept inside the box so the widest seats (left and right) don't clip on a
-  // narrow phone, and matched to the felt inset so seats sit on its edge.
-  const RX = 37;
-  const RY = 45;
+  const cap = Math.PI * A; // length of one semicircular cap
+  const side = 2 * H; // length of one straight side
+  const perimeter = 2 * cap + 2 * side;
+
+  const pointAt = (s: number): { x: number; y: number } => {
+    let d = s % perimeter;
+    // 1. bottom-left quarter cap: (0, B) -> (-A, H)
+    if (d < cap / 2) {
+      const t = (d / (cap / 2)) * (Math.PI / 2);
+      return { x: -A * Math.sin(t), y: H + A * Math.cos(t) };
+    }
+    d -= cap / 2;
+    // 2. left straight: (-A, H) -> (-A, -H)
+    if (d < side) return { x: -A, y: H - d };
+    d -= side;
+    // 3. top cap: (-A, -H) -> (A, -H)
+    if (d < cap) {
+      const t = (d / cap) * Math.PI;
+      return { x: -A * Math.cos(t), y: -H - A * Math.sin(t) };
+    }
+    d -= cap;
+    // 4. right straight: (A, -H) -> (A, H)
+    if (d < side) return { x: A, y: -H + d };
+    d -= side;
+    // 5. bottom-right quarter cap: (A, H) -> (0, B)
+    const t = (d / (cap / 2)) * (Math.PI / 2);
+    return { x: A * Math.cos(t), y: H + A * Math.sin(t) };
+  };
+
   return Array.from({ length: count }, (_, i) => {
-    const theta = (Math.PI / 2) + (i * 2 * Math.PI) / count;
-    return { x: 50 + RX * Math.cos(theta), y: 50 + RY * Math.sin(theta) };
+    const p = pointAt((i * perimeter) / count);
+    return { x: 50 + p.x, y: 50 + p.y };
   });
 }
 
@@ -61,9 +96,11 @@ export function PokerTable({ seats, pot, heroSeat, boards }: PokerTableProps) {
     // Height-constrained rather than width-constrained: the table, the hero's
     // cards and the action bar all have to be on screen at once, without
     // scrolling, to be usable one-handed at a live table.
-    <div className="relative h-[min(58vh,520px)] aspect-[3/5] mx-auto">
+    <div className="relative h-[min(50vh,460px)] aspect-[3/5] mx-auto">
       {/* Felt */}
-      <div className="absolute inset-x-[13%] inset-y-[5%] rounded-[50%] bg-emerald-800 border-[6px] border-zinc-800 shadow-inner" />
+      {/* Stadium, not an ellipse: rounded-full on a tall box gives straight
+          sides with semicircular caps, which is the real table shape. */}
+      <div className="absolute inset-x-[13%] inset-y-[5%] rounded-full bg-emerald-800 border-[6px] border-zinc-800 shadow-inner" />
 
       {/* Boards and pot */}
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 pointer-events-none">
@@ -81,11 +118,17 @@ export function PokerTable({ seats, pot, heroSeat, boards }: PokerTableProps) {
 
       {ordered.map((s, display) => {
         const pos = positions[display];
-        // Chip indicator sits between the seat and the middle of the table.
-        const chip = {
-          x: 50 + (pos.x - 50) * 0.58,
-          y: 50 + (pos.y - 50) * 0.58,
+        // Offset a fixed distance INWARD from the seat. Scaling the position
+        // vector instead would drift badly on the stadium's straight sides,
+        // leaving markers stranded mid-felt instead of beside their seat.
+        const inward = (distance: number) => {
+          const dx = 50 - pos.x;
+          const dy = 50 - pos.y;
+          const len = Math.hypot(dx, dy) || 1;
+          return { x: pos.x + (dx / len) * distance, y: pos.y + (dy / len) * distance };
         };
+        const chip = inward(19);
+        const button = inward(9);
         return (
           <div key={s.seat}>
             {/* Seat */}
@@ -120,10 +163,7 @@ export function PokerTable({ seats, pot, heroSeat, boards }: PokerTableProps) {
             {s.isDealer && (
               <div
                 className="absolute -translate-x-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white text-zinc-900 text-[10px] font-bold flex items-center justify-center shadow"
-                style={{
-                  left: `${50 + (pos.x - 50) * 0.74}%`,
-                  top: `${50 + (pos.y - 50) * 0.62}%`,
-                }}
+                style={{ left: `${button.x}%`, top: `${button.y}%` }}
               >
                 D
               </div>
