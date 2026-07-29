@@ -17,7 +17,6 @@ import {
   requiredEquityToCall,
 } from '@/engine/betting';
 import { useEquity } from '@/hooks/useEquity';
-import { positionLabels } from '@/lib/positions';
 import { TrainerCard } from "@/components/TrainerCard";
 import { CardPickerSheet } from '@/components/CardPickerSheet';
 
@@ -54,17 +53,18 @@ function boardPrefix(board: (Card | null)[]): Card[] | null {
 const pct = (x: number) => `${(x * 100).toFixed(1)}%`;
 
 export default function Home() {
-  const [playerCount, setPlayerCount] = useState(4);
+  const [playerCount, setPlayerCount] = useState(2);
   const [variant, setVariant] = useState<Variant>(4);
   const [doubleBoard, setDoubleBoard] = useState(true);
   const [ante, setAnte] = useState(6);
-  const [hands, setHands] = useState<(Card | null)[][]>(() => emptyHands(4, 4));
+  const [hands, setHands] = useState<(Card | null)[][]>(() => emptyHands(2, 4));
   const [boards, setBoards] = useState<(Card | null)[][]>(emptyBoards);
   const [picker, setPicker] = useState<Slot | null>(null);
   const [betFraction, setBetFraction] = useState<number | 'allin' | null>(null);
   const [potOverride, setPotOverride] = useState<number | null>(null);
 
-  const positions = positionLabels(playerCount);
+  // The Tool is a scratchpad, not a table: seats are just Player 1..8.
+  const positions = Array.from({ length: playerCount }, (_, i) => `Player ${i + 1}`);
   const nBoards = doubleBoard ? 2 : 1;
   const stack = effectiveStack(ante);
   const defaultPot = antePot(ante, playerCount);
@@ -167,24 +167,50 @@ export default function Home() {
     setHands(next);
   }
 
-  // Next street across the active boards: both boards advance together.
+  // Both boards advance together, so street state is the shared minimum.
   const minFilled = Math.min(
     ...boards.slice(0, nBoards).map((b) => b.filter((c) => c !== null).length),
   );
-  const nextStreet =
-    minFilled < 3 ? 'flop' : minFilled === 3 ? 'turn' : minFilled === 4 ? 'river' : null;
 
-  function dealStreet() {
-    if (nextStreet === null) return;
-    const target = minFilled < 3 ? 3 : minFilled + 1;
+  /** Cards on each board once the street is complete, and what precedes it. */
+  const STREETS = [
+    { street: 'flop' as const, size: 3, keep: 0 },
+    { street: 'turn' as const, size: 4, keep: 3 },
+    { street: 'river' as const, size: 5, keep: 4 },
+  ];
+
+  /**
+   * Deal or re-deal a street. Re-dealing clears that street AND everything
+   * after it — a new flop can't leave the old turn and river standing — then
+   * redraws from a pool rebuilt off the cleared boards, so the cards being
+   * replaced are available again.
+   */
+  function runStreet(size: number, keep: number) {
+    const cleared = boards.map((b, i) =>
+      i < nBoards ? b.map((c, j) => (j >= keep ? null : c)) : b,
+    );
+    const used = new Set<Card>();
+    for (const h of hands) for (const c of h) if (c !== null) used.add(c);
+    for (const b of cleared) for (const c of b) if (c !== null) used.add(c);
     // Same purity rule as dealHands: draw before setState, not inside it.
-    const pool = makeDeck().filter((c) => !usedCards.has(c));
-    const next = boards.map((b, i) =>
-      i < nBoards
-        ? b.map((c, j) => (c === null && j < target ? drawFrom(pool) : c))
-        : b,
+    const pool = makeDeck().filter((c) => !used.has(c));
+    const next = cleared.map((b, i) =>
+      i < nBoards ? b.map((c, j) => (c === null && j < size ? drawFrom(pool) : c)) : b,
     );
     setBoards(next);
+  }
+
+  function addPlayer() {
+    if (playerCount >= 8) return;
+    setPlayerCount(playerCount + 1);
+    setHands([...hands, Array<Card | null>(variant).fill(null)]);
+  }
+
+  function removePlayer() {
+    if (playerCount <= 2) return;
+    setPlayerCount(playerCount - 1);
+    setHands(hands.slice(0, -1));
+    setPicker(null);
   }
 
   function endHand() {
@@ -193,16 +219,6 @@ export default function Home() {
     setPicker(null);
     setBetFraction(null);
     setPotOverride(null);
-  }
-
-  function changePlayerCount(n: number) {
-    setPlayerCount(n);
-    setHands((prev) => {
-      const next = emptyHands(n, variant);
-      for (let i = 0; i < Math.min(prev.length, n); i++) next[i] = prev[i];
-      return next;
-    });
-    setPicker(null);
   }
 
   function changeVariant(v: Variant) {
@@ -243,23 +259,6 @@ export default function Home() {
         {/* Table setup */}
         <section className="rounded-xl bg-surface border border-line p-3 flex flex-col gap-3">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-            <div className="flex items-center gap-2">
-              <span>Players</span>
-              {[4, 5, 6, 7, 8].map((n) => (
-                <button
-                  key={n}
-                  type="button"
-                  onClick={() => changePlayerCount(n)}
-                  className={`px-2.5 py-1 rounded-lg text-sm font-medium border ${
-                    playerCount === n
-                      ? 'bg-accent border-accent text-accent-fg'
-                      : 'border-line-2 hover:bg-surface-2'
-                  }`}
-                >
-                  {n}
-                </button>
-              ))}
-            </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
@@ -343,15 +342,31 @@ export default function Home() {
               </div>
             </div>
           ))}
-          {nextStreet !== null && (
-            <button
-              type="button"
-              onClick={dealStreet}
-              className="w-full text-sm px-3 py-2 rounded-lg bg-accent hover:bg-accent/85 text-accent-fg font-semibold"
-            >
-              Deal {nextStreet}
-            </button>
-          )}
+          {/* One row, one button per street. Each stays live after dealing so
+              a street can be re-run to see how the same hands play out. */}
+          <div className="flex gap-2">
+            {STREETS.map(({ street, size, keep }) => {
+              const dealt = minFilled >= size;
+              const available = minFilled >= keep;
+              return (
+                <button
+                  key={street}
+                  type="button"
+                  disabled={!available}
+                  onClick={() => runStreet(size, keep)}
+                  className={`flex-1 text-sm px-2 py-2 rounded-lg font-semibold transition-colors ${
+                    available
+                      ? dealt
+                        ? 'border-2 border-accent text-accent-text hover:bg-accent/10'
+                        : 'bg-accent hover:bg-accent/85 text-accent-fg'
+                      : 'border-2 border-line-2 text-edge cursor-not-allowed'
+                  }`}
+                >
+                  {dealt ? 'Redeal' : 'Deal'} {street}
+                </button>
+              );
+            })}
+          </div>
           {!equityEnabled && (
             <p className="text-xs text-rail">
               {completePlayers.length < 2
@@ -371,7 +386,7 @@ export default function Home() {
                 key={p}
                 className="rounded-xl bg-surface border border-line p-2.5 flex flex-wrap items-center gap-2"
               >
-                <div className="w-14 shrink-0">
+                <div className="w-20 shrink-0">
                   <div className="text-sm font-semibold">{positions[p]}</div>
                   <div className="text-[10px] text-ink-3">{stack}bb</div>
                 </div>
@@ -417,6 +432,27 @@ export default function Home() {
               </div>
             );
           })}
+
+          {/* Seats are added and removed here rather than picked up front, so
+              the list grows where it is actually read. */}
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={addPlayer}
+              disabled={playerCount >= 8}
+              className="flex-1 py-2 rounded-xl border-2 border-dashed border-line-2 text-sm font-medium text-ink-2 hover:bg-surface-2 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              + Add player
+            </button>
+            <button
+              type="button"
+              onClick={removePlayer}
+              disabled={playerCount <= 2}
+              className="px-4 py-2 rounded-xl border-2 border-dashed border-line-2 text-sm font-medium text-ink-2 hover:bg-surface-2 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              − Remove
+            </button>
+          </div>
         </section>
 
         {/* Equity status */}
