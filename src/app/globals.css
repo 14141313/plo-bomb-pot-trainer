@@ -146,7 +146,11 @@
     --line: #27272a;
     --line-2: #3f3f46;
     --ink-2: #d4d4d8;
-    /* --ink-3 and --edge hold in both modes. */
+    /* ink-3 must lighten in dark mode: L 0.552 measures 4.10:1 on the dark
+       page and 3.67:1 on dark surfaces — under the 4.5:1 floor for the small
+       text it styles. L 0.712 clears every dark context (6.9-7.7:1). */
+    --ink-3: #a1a1aa;
+    /* --edge holds in both modes. */
 
     --good-bg: #143a2b;
     --good-fg: #7fd7ac;
@@ -168,6 +172,7 @@
       --line: oklch(0.274 0.005 286);
       --line-2: oklch(0.37 0.012 285.8);
       --ink-2: oklch(0.871 0.005 286.3);
+      --ink-3: oklch(0.712 0.013 286.1);
 
       --good-bg: oklch(0.32 0.06 156.7);
       --good-fg: oklch(0.82 0.13 156.7);

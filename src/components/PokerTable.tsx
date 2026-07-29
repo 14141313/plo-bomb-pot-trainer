@@ -183,7 +183,11 @@ export function PokerTable({ seats, pot, heroSeat, boards, inHand }: PokerTableP
                   )}
                   {s.label}
                 </span>
-                <span className="text-[10px] text-ink-3">
+                {/* The seat pill is ALWAYS dark, so its muted text uses the
+                    fixed --edge token, not mode-flipping ink-3 — in light
+                    mode ink-3 stays L 0.552, which is 3.67:1 on this pill.
+                    edge measures 6.92:1 here in both modes. */}
+                <span className="text-[11px] text-edge">
                   {s.stack.toFixed(s.stack % 1 === 0 ? 0 : 1)}
                 </span>
               </div>

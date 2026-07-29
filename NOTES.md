@@ -191,6 +191,27 @@ leader shares the grade-D hue (55).
   per the typography pass (14px UI, 12-13px captions, 16px mobile inputs) —
   they are the type system, not unreviewed defaults.
 
+### Light-mode invisibility and small-text contrast
+
+- **Action buttons were invisible in light mode** (reported from mobile
+  Safari). The neutral bar was `border-white/70 text-white` on
+  `bg-transparent` — designed against the dark chrome, so on a white page it
+  was white-on-white. The buttons rendered and were tappable, just unseeable.
+  Now `text-foreground` with a `border-foreground/55` stroke, measured
+  17.9:1 text / 3.95:1 stroke in light and 16.9:1 / 5.44:1 in dark. Still
+  fully neutral — no colour coding reintroduced.
+  The stroke started at `/45` and measured 2.96:1, just under the 3:1 floor
+  for a UI boundary; `/55` clears it.
+- **`--ink-3` failed on dark surfaces.** At L 0.552 it measured 3.67:1 on the
+  seat pill and 4.10:1 on the dark page, under the 4.5:1 floor for the small
+  text it styles. It now lightens to L 0.712 in dark mode. The seat pill is
+  a *fixed*-dark surface in both themes, so its stack figure uses the fixed
+  `--edge` token rather than mode-flipping `ink-3` — measured 6.91:1 in both
+  modes, and the size went 10px → 11px.
+- General rule this exposed: `text-white` is only safe on a **fixed** dark or
+  coloured fill (suit cards, grade pills, seat pills). Anything sitting on
+  the page background has to use `foreground`, or it breaks in one theme.
+
 ### Dark mode block: intentional
 
 The `@media (prefers-color-scheme: dark)` background/foreground switch is
