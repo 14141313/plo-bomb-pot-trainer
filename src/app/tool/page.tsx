@@ -63,8 +63,8 @@ export default function Home() {
   const [betFraction, setBetFraction] = useState<number | 'allin' | null>(null);
   const [potOverride, setPotOverride] = useState<number | null>(null);
 
-  // The Tool is a scratchpad, not a table: seats are just Player 1..8.
-  const positions = Array.from({ length: playerCount }, (_, i) => `Player ${i + 1}`);
+  // The Tool is a scratchpad, not a table: seats are just P1..P8.
+  const positions = Array.from({ length: playerCount }, (_, i) => `P${i + 1}`);
   const nBoards = doubleBoard ? 2 : 1;
   const stack = effectiveStack(ante);
   const defaultPot = antePot(ante, playerCount);
@@ -206,10 +206,11 @@ export default function Home() {
     setHands([...hands, Array<Card | null>(variant).fill(null)]);
   }
 
-  function removePlayer() {
+  /** Remove one specific seat. Later seats renumber, so drop the picker. */
+  function removePlayer(index: number) {
     if (playerCount <= 2) return;
     setPlayerCount(playerCount - 1);
-    setHands(hands.slice(0, -1));
+    setHands(hands.filter((_, i) => i !== index));
     setPicker(null);
   }
 
@@ -386,7 +387,7 @@ export default function Home() {
                 key={p}
                 className="rounded-xl bg-surface border border-line p-2.5 flex flex-wrap items-center gap-2"
               >
-                <div className="w-20 shrink-0">
+                <div className="w-9 shrink-0">
                   <div className="text-sm font-semibold">{positions[p]}</div>
                   <div className="text-[10px] text-ink-3">{stack}bb</div>
                 </div>
@@ -429,30 +430,33 @@ export default function Home() {
                     )}
                   </div>
                 )}
+
+                {/* Remove is per-row: the seat you want gone is rarely the
+                    last one in the list. */}
+                <button
+                  type="button"
+                  onClick={() => removePlayer(p)}
+                  disabled={playerCount <= 2}
+                  aria-label={`Remove ${positions[p]}`}
+                  title={`Remove ${positions[p]}`}
+                  className="ml-1 w-7 h-7 shrink-0 rounded-lg border border-line-2 text-ink-3 hover:bg-surface-2 hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  ×
+                </button>
               </div>
             );
           })}
 
-          {/* Seats are added and removed here rather than picked up front, so
-              the list grows where it is actually read. */}
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={addPlayer}
-              disabled={playerCount >= 8}
-              className="flex-1 py-2 rounded-xl border-2 border-dashed border-line-2 text-sm font-medium text-ink-2 hover:bg-surface-2 disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              + Add player
-            </button>
-            <button
-              type="button"
-              onClick={removePlayer}
-              disabled={playerCount <= 2}
-              className="px-4 py-2 rounded-xl border-2 border-dashed border-line-2 text-sm font-medium text-ink-2 hover:bg-surface-2 disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              − Remove
-            </button>
-          </div>
+          {/* Seats are added here rather than picked up front, so the list
+              grows where it is actually read. */}
+          <button
+            type="button"
+            onClick={addPlayer}
+            disabled={playerCount >= 8}
+            className="py-2 rounded-xl border-2 border-dashed border-line-2 text-sm font-medium text-ink-2 hover:bg-surface-2 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            + Add player
+          </button>
         </section>
 
         {/* Equity status */}
