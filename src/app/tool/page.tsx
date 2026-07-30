@@ -360,7 +360,12 @@ export default function Home() {
                       ? dealt
                         ? 'border border-accent text-accent-text hover:bg-accent/10'
                         : 'bg-accent hover:bg-accent/85 text-accent-fg'
-                      : 'border border-line-2 text-edge cursor-not-allowed'
+                      : // Disabled: the stroke mutes too, not just the label.
+                        // Fixed --edge rather than a mode-flipping line token,
+                        // because the felt underneath is light in BOTH themes,
+                        // so a flipping border would read dark and prominent in
+                        // dark mode - the opposite of disabled.
+                        'border border-edge text-edge cursor-not-allowed'
                   }`}
                 >
                   {dealt ? 'Redeal' : 'Deal'} {street}
