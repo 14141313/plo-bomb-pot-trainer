@@ -259,7 +259,7 @@ export default function TrainerPage() {
       <h1 className="text-lg font-bold">Trainer</h1>
 
       {!hand && (
-        <section className="rounded-xl border border-line p-3 flex flex-col gap-3">
+        <section className="rounded-xl p-3 flex flex-col gap-3">
           <div className="text-xs text-ink-3">
             Trainer is fixed at {TRAINER_PLAYER_COUNT}-handed for now.
           </div>
@@ -379,7 +379,7 @@ export default function TrainerPage() {
           )}
 
           {hand.complete && (
-            <section className="rounded-xl border border-line p-3 flex flex-col gap-3">
+            <section className="rounded-xl p-3 flex flex-col gap-3">
               <div className="font-semibold">Hand review</div>
 
               <div className="text-xs text-ink-3">
@@ -391,7 +391,7 @@ export default function TrainerPage() {
                 {entries.map((e, i) => (
                   <div
                     key={i}
-                    className="nums rounded-lg border border-line p-2 text-xs flex flex-col gap-1"
+                    className="nums rounded-lg p-2 text-xs flex flex-col gap-1"
                   >
                     <div className="flex items-center gap-2">
                       <GradePill grade={e.grade} />
@@ -443,7 +443,7 @@ export default function TrainerPage() {
       )}
 
       {session.length > 0 && (
-        <section className="nums rounded-xl border border-line p-3">
+        <section className="nums rounded-xl p-3">
           <div className="flex items-center gap-2 mb-2">
             <span className="font-semibold">Session</span>
             {sessionGrade && <GradePill grade={sessionGrade} />}

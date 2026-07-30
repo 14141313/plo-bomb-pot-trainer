@@ -258,7 +258,7 @@ export default function Home() {
         </header>
 
         {/* Table setup */}
-        <section className="rounded-xl bg-surface border border-line p-3 flex flex-col gap-3">
+        <section className="rounded-xl bg-surface p-3 flex flex-col gap-3">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
           </div>
 
@@ -390,7 +390,7 @@ export default function Home() {
             return (
               <div
                 key={p}
-                className="rounded-xl bg-surface border border-line p-2.5 flex flex-wrap items-center gap-2"
+                className="rounded-xl bg-surface p-2.5 flex flex-wrap items-center gap-2"
               >
                 <div className="w-9 shrink-0">
                   <div className="text-sm font-semibold">{positions[p]}</div>
@@ -491,7 +491,7 @@ export default function Home() {
         )}
 
         {/* Facing a bet */}
-        <section className="rounded-xl bg-surface border border-line p-3 flex flex-col gap-2">
+        <section className="rounded-xl bg-surface p-3 flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold">
               Facing a bet {allBoardsComplete ? '· pot odds check' : '· EV projection (cards to come)'}
@@ -577,7 +577,7 @@ export default function Home() {
         </section>
 
         {/* Actions */}
-        <div className="fixed bottom-0 inset-x-0 bg-surface/90 backdrop-blur border-t border-line">
+        <div className="fixed bottom-0 inset-x-0 bg-surface/90 backdrop-blur">
           <div className="max-w-3xl mx-auto px-3 py-2.5 flex gap-2">
             <button
               type="button"
