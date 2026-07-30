@@ -324,7 +324,7 @@ export default function Home() {
         </section>
 
         {/* Boards */}
-        <section className="rounded-xl bg-felt border-4 border-rail text-seat p-3 flex flex-col gap-3">
+        <section className="rounded-xl bg-felt text-seat p-3 flex flex-col gap-3">
           {Array.from({ length: nBoards }, (_, b) => (
             <div key={b} className="flex items-center gap-2">
               <span className="w-14 text-xs font-medium text-rail shrink-0">
@@ -439,7 +439,10 @@ export default function Home() {
                   disabled={playerCount <= 2}
                   aria-label={`Remove ${positions[p]}`}
                   title={`Remove ${positions[p]}`}
-                  className="ml-1 w-7 h-7 shrink-0 rounded-lg border border-line-2 text-ink-3 hover:bg-surface-2 hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed"
+                  /* Square, matching the card height (h-8), and always flush
+                     right. The equity block carries ml-auto when it exists, so
+                     this only needs it when there is no equity yet. */
+                  className={`${pe ? 'ml-1' : 'ml-auto'} w-8 h-8 shrink-0 rounded-lg border border-line-2 text-ink-3 hover:bg-surface-2 hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed`}
                 >
                   ×
                 </button>
