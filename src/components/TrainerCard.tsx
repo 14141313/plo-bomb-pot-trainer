@@ -63,7 +63,7 @@ interface TrainerCardProps {
 
 export function TrainerCard({ card, size = 'md', onClick, active }: TrainerCardProps) {
   const base = `${SIZES[size]} flex items-center justify-center font-bold select-none transition-shadow`;
-  const ring = active ? 'ring-2 ring-accent' : '';
+  const ring = active ? 'ring-1 ring-accent' : '';
 
   if (card === null) {
     return (
@@ -71,7 +71,7 @@ export function TrainerCard({ card, size = 'md', onClick, active }: TrainerCardP
         type="button"
         onClick={onClick}
         aria-label="Empty card slot"
-        className={`${base} ${ring} border-2 border-dashed border-edge/70 text-edge hover:border-edge`}
+        className={`${base} ${ring} border border-edge text-edge hover:border-foreground`}
       >
         +
       </button>

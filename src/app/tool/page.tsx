@@ -358,9 +358,9 @@ export default function Home() {
                   className={`flex-1 text-sm px-2 py-2 rounded-lg font-semibold transition-colors ${
                     available
                       ? dealt
-                        ? 'border-2 border-accent text-accent-text hover:bg-accent/10'
+                        ? 'border border-accent text-accent-text hover:bg-accent/10'
                         : 'bg-accent hover:bg-accent/85 text-accent-fg'
-                      : 'border-2 border-line-2 text-edge cursor-not-allowed'
+                      : 'border border-line-2 text-edge cursor-not-allowed'
                   }`}
                 >
                   {dealt ? 'Redeal' : 'Deal'} {street}
@@ -453,7 +453,7 @@ export default function Home() {
             type="button"
             onClick={addPlayer}
             disabled={playerCount >= 8}
-            className="py-2 rounded-xl border-2 border-dashed border-line-2 text-sm font-medium text-ink-2 hover:bg-surface-2 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="py-2 rounded-xl border border-line-2 text-sm font-medium text-ink-2 hover:bg-surface-2 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             + Add player
           </button>
