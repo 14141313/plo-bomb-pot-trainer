@@ -331,6 +331,7 @@ export default function TrainerPage() {
             heroSeat={hand.heroSeat}
             boards={hand.boards}
             inHand={!hand.complete}
+            handSize={config.variant}
           />
 
           <div className="flex items-center justify-between text-xs text-ink-3">

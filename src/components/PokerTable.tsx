@@ -37,6 +37,8 @@ interface PokerTableProps {
   boards: ReadonlyArray<readonly Card[]>;
   /** True while the hand is live, so live seats show card backs. */
   inHand: boolean;
+  /** Hole cards per player: 4 (PLO4) or 5 (PLO5). */
+  handSize: number;
 }
 
 /** Width / height of the table box. Must match the aspect class below. */
@@ -95,21 +97,25 @@ function seatPositions(count: number): Array<{ x: number; y: number }> {
   });
 }
 
-/** Face-down cards, so it's obvious who is still in the hand. */
-function CardBacks() {
+/**
+ * Face-down cards, so it's obvious who is still in the hand. Shows the real
+ * hand size (4 for PLO4, 5 for PLO5), overlapped so a full Omaha hand still
+ * fits in a seat's width.
+ */
+function CardBacks({ count }: { count: number }) {
   return (
-    <div className="flex gap-0.5">
-      {[0, 1].map((i) => (
+    <div className="flex">
+      {Array.from({ length: count }, (_, i) => (
         <span
           key={i}
-          className="w-3 h-4 rounded-[2px] bg-card-back border border-card-back-edge"
+          className="w-3 h-4 rounded-[2px] bg-card-back border border-card-back-edge -ml-1 first:ml-0"
         />
       ))}
     </div>
   );
 }
 
-export function PokerTable({ seats, pot, heroSeat, boards, inHand }: PokerTableProps) {
+export function PokerTable({ seats, pot, heroSeat, boards, inHand, handSize }: PokerTableProps) {
   const count = seats.length;
   const positions = seatPositions(count);
 
@@ -157,7 +163,7 @@ export function PokerTable({ seats, pot, heroSeat, boards, inHand }: PokerTableP
                   ))}
                 </div>
               ) : (
-                inHand && !s.folded && <CardBacks />
+                inHand && !s.folded && <CardBacks count={handSize} />
               )}
               <div
                 className={`flex flex-col items-center rounded border px-1.5 py-0.5 leading-tight ${
