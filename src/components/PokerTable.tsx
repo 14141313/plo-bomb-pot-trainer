@@ -127,7 +127,7 @@ export function PokerTable({ seats, pot, heroSeat, boards, inHand, handSize }: P
   return (
     <div className="nums relative w-full max-w-[420px] aspect-[4/5] mx-auto">
       {/* Felt */}
-      <div className="absolute inset-x-[13%] inset-y-[5%] rounded-full bg-felt border-4 border-rail shadow-inner" />
+      <div className="absolute inset-x-[13%] inset-y-[5%] rounded-full bg-felt shadow-[0_2px_4px_rgba(0,0,0,0.10),0_10px_30px_rgba(0,0,0,0.18)]" />
 
       {/* Boards and pot. Sized so a full double board (5 + 5) still fits. */}
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 pointer-events-none">

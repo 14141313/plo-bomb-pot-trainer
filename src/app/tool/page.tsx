@@ -324,7 +324,7 @@ export default function Home() {
         </section>
 
         {/* Boards */}
-        <section className="rounded-xl bg-felt text-seat p-3 flex flex-col gap-3">
+        <section className="rounded-xl bg-felt text-seat p-3 flex flex-col gap-3 shadow-[0_2px_4px_rgba(0,0,0,0.10),0_10px_30px_rgba(0,0,0,0.18)]">
           {Array.from({ length: nBoards }, (_, b) => (
             <div key={b} className="flex items-center gap-2">
               <span className="w-14 text-xs font-medium text-rail shrink-0">
