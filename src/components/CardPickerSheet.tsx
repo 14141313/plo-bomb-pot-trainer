@@ -35,7 +35,10 @@ export function CardPickerSheet({
         className="absolute inset-0 bg-black/40"
         onClick={onClose}
       />
-      <div className="relative w-full sm:w-auto sm:min-w-[420px] bg-surface rounded-t-2xl sm:rounded-2xl p-2 sm:p-4 shadow-xl">
+      {/* Wide enough on sm+ that 13 rank columns reach a 40px square each
+          (24px suit label + 13x40 + gaps + padding). On a phone that would
+          need ~566px, so cells there are 24x40 — the full width available. */}
+      <div className="relative w-full sm:w-auto sm:min-w-[640px] bg-surface rounded-t-2xl sm:rounded-2xl p-2 sm:p-4 shadow-xl">
         <div className="flex items-center justify-between mb-3">
           <span className="text-sm font-medium text-ink-2">
             Pick: {targetLabel}
@@ -77,7 +80,7 @@ export function CardPickerSheet({
                     /* Filled suit colour, matching the cards themselves. The
                        row's suit symbol keeps the grid unambiguous even
                        though the cells carry no glyph. */
-                    className={`h-10 sm:h-9 min-w-0 rounded text-xs sm:text-sm font-bold transition-opacity
+                    className={`h-10 min-w-0 rounded text-sm font-bold transition-opacity
                       ${
                         used
                           ? 'bg-surface-2 text-edge cursor-not-allowed'
