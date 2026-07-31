@@ -32,7 +32,7 @@ export default function RootLayout({
         {/* Site-level h1: the tabs are sections of this one product, so the
             title sits above them and the pages carry no heading of their own. */}
         <header className="mx-auto w-full max-w-3xl px-4 pt-4 pb-3">
-          <h1 className="text-lg font-bold">
+          <h1 className="text-lg font-bold text-center">
             <span aria-hidden="true">💣</span> Defuse Bomb Pots
           </h1>
         </header>
