@@ -41,8 +41,12 @@ export function CardPickerSheet({
       {/* Four columns need far less width than thirteen, so the sheet goes
           back to a comfortable reading width and is capped on desktop rather
           than stretched. */}
-      <div className="relative w-full sm:w-auto sm:min-w-[360px] sm:max-w-[420px] bg-surface rounded-t-2xl sm:rounded-2xl p-3 sm:p-4 shadow-xl">
-        <div className="flex items-center justify-between mb-3">
+      {/* Flex column capped to the viewport: the grid below takes whatever
+          height is left, so the deck shows in full when it fits and only
+          scrolls on genuinely short screens. dvh, not vh, so mobile Safari's
+          collapsing address bar doesn't cause a phantom overflow. */}
+      <div className="relative w-full sm:w-auto sm:min-w-[360px] sm:max-w-[420px] max-h-[96dvh] flex flex-col bg-surface rounded-t-2xl sm:rounded-2xl p-3 sm:p-4 shadow-xl">
+        <div className="flex items-center justify-between mb-3 shrink-0">
           <span className="text-sm font-medium text-ink-2">
             Pick: {targetLabel}
           </span>
@@ -70,7 +74,7 @@ export function CardPickerSheet({
           roughly 85px per cell, so every target clears 40x40 in both
           dimensions; the cost is 13 rows, hence the scroll.
         */}
-        <div className="grid grid-cols-4 gap-1 max-h-[65vh] overflow-y-auto">
+        <div className="grid grid-cols-4 gap-1 flex-1 min-h-0 auto-rows-min overflow-y-auto">
           {SUIT_ORDER.map((suit) => (
             <span
               key={`head-${suit}`}
