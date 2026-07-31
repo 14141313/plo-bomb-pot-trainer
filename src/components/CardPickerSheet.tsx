@@ -10,6 +10,9 @@ import type { Card } from '@/engine/cards';
 import { RANKS, makeCard } from '@/engine/cards';
 import { suitBgClass, suitSymbol, suitTextClass } from './TrainerCard';
 
+/** Column order: spades, hearts, diamonds, clubs. */
+const SUIT_ORDER = [3, 2, 1, 0] as const;
+
 interface CardPickerSheetProps {
   /** Every card currently placed anywhere on the table. */
   usedCards: ReadonlySet<Card>;
@@ -35,10 +38,10 @@ export function CardPickerSheet({
         className="absolute inset-0 bg-black/40"
         onClick={onClose}
       />
-      {/* Wide enough on sm+ that 13 rank columns reach a 40px square each
-          (24px suit label + 13x40 + gaps + padding). On a phone that would
-          need ~566px, so cells there are 24x40 — the full width available. */}
-      <div className="relative w-full sm:w-auto sm:min-w-[640px] bg-surface rounded-t-2xl sm:rounded-2xl p-2 sm:p-4 shadow-xl">
+      {/* Four columns need far less width than thirteen, so the sheet goes
+          back to a comfortable reading width and is capped on desktop rather
+          than stretched. */}
+      <div className="relative w-full sm:w-auto sm:min-w-[360px] sm:max-w-[420px] bg-surface rounded-t-2xl sm:rounded-2xl p-3 sm:p-4 shadow-xl">
         <div className="flex items-center justify-between mb-3">
           <span className="text-sm font-medium text-ink-2">
             Pick: {targetLabel}
@@ -60,26 +63,42 @@ export function CardPickerSheet({
             </button>
           </div>
         </div>
-        <div className="grid grid-cols-[auto_repeat(13,minmax(0,1fr))] gap-0.5 sm:gap-1 overflow-x-auto">
-          {([3, 2, 1, 0] as const).map((suit) => (
-            <div key={suit} className="contents">
-              <span
-                className={`flex items-center justify-center w-5 sm:w-6 text-base sm:text-lg ${suitTextClass(suit)}`}
-              >
-                {suitSymbol(suit)}
+        {/*
+          Suits across, ranks down. Transposed from the original rank-across
+          matrix because 13 columns cannot give a 40px-wide target on a phone
+          (13x40 plus the label needs ~566px against a 375px viewport). Four
+          columns leave roughly 80px per cell, so every target clears 40x40 in
+          both dimensions; the cost is 13 rows, hence the scroll.
+        */}
+        <div className="grid grid-cols-[auto_repeat(4,minmax(0,1fr))] gap-1 max-h-[65vh] overflow-y-auto">
+          <span aria-hidden />
+          {SUIT_ORDER.map((suit) => (
+            <span
+              key={`head-${suit}`}
+              className={`flex items-center justify-center text-lg leading-none pb-1 ${suitTextClass(suit)}`}
+            >
+              {suitSymbol(suit)}
+            </span>
+          ))}
+
+          {Array.from({ length: 13 }, (_, i) => 12 - i).map((rank) => (
+            <div key={rank} className="contents">
+              <span className="flex items-center justify-center w-6 text-sm font-semibold text-ink-2">
+                {RANKS[rank]}
               </span>
-              {Array.from({ length: 13 }, (_, i) => 12 - i).map((rank) => {
+              {SUIT_ORDER.map((suit) => {
                 const card = makeCard(rank, suit);
                 const used = usedCards.has(card);
                 return (
                   <button
-                    key={rank}
+                    key={suit}
                     type="button"
                     disabled={used}
                     onClick={() => onPick(card)}
+                    aria-label={`${RANKS[rank]}${'cdhs'[suit]}`}
                     /* Filled suit colour, matching the cards themselves. The
-                       row's suit symbol keeps the grid unambiguous even
-                       though the cells carry no glyph. */
+                       column header and row label keep the grid unambiguous
+                       even though the cells carry no glyph. */
                     className={`h-10 min-w-0 rounded text-sm font-bold transition-opacity
                       ${
                         used
