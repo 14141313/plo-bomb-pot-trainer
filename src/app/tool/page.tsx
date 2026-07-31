@@ -254,10 +254,6 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground pb-24">
       <main className="max-w-3xl mx-auto px-3 py-4 flex flex-col gap-4">
-        <header>
-          <h1 className="text-lg font-bold">PLO Bomb Pot Trainer</h1>
-        </header>
-
         {/* Table setup */}
         <section className="rounded-xl bg-surface p-3 flex flex-col gap-3">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-2 text-sm">

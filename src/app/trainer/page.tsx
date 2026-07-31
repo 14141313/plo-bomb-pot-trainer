@@ -257,8 +257,6 @@ export default function TrainerPage() {
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 py-4 flex flex-col gap-4 text-sm pb-28">
-      <h1 className="text-lg font-bold">Trainer</h1>
-
       {!hand && (
         <section className="rounded-xl p-3 flex flex-col gap-3">
           <div className="text-xs text-ink-3">
