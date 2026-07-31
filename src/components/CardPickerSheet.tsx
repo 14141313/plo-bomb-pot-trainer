@@ -66,12 +66,11 @@ export function CardPickerSheet({
         {/*
           Suits across, ranks down. Transposed from the original rank-across
           matrix because 13 columns cannot give a 40px-wide target on a phone
-          (13x40 plus the label needs ~566px against a 375px viewport). Four
-          columns leave roughly 80px per cell, so every target clears 40x40 in
-          both dimensions; the cost is 13 rows, hence the scroll.
+          (13x40 needs ~566px against a 375px viewport). Four columns leave
+          roughly 85px per cell, so every target clears 40x40 in both
+          dimensions; the cost is 13 rows, hence the scroll.
         */}
-        <div className="grid grid-cols-[auto_repeat(4,minmax(0,1fr))] gap-1 max-h-[65vh] overflow-y-auto">
-          <span aria-hidden />
+        <div className="grid grid-cols-4 gap-1 max-h-[65vh] overflow-y-auto">
           {SUIT_ORDER.map((suit) => (
             <span
               key={`head-${suit}`}
@@ -83,9 +82,6 @@ export function CardPickerSheet({
 
           {Array.from({ length: 13 }, (_, i) => 12 - i).map((rank) => (
             <div key={rank} className="contents">
-              <span className="flex items-center justify-center w-6 text-sm font-semibold text-ink-2">
-                {RANKS[rank]}
-              </span>
               {SUIT_ORDER.map((suit) => {
                 const card = makeCard(rank, suit);
                 const used = usedCards.has(card);
@@ -97,8 +93,8 @@ export function CardPickerSheet({
                     onClick={() => onPick(card)}
                     aria-label={`${RANKS[rank]}${'cdhs'[suit]}`}
                     /* Filled suit colour, matching the cards themselves. The
-                       column header and row label keep the grid unambiguous
-                       even though the cells carry no glyph. */
+                       column header carries the suit, and the rank is on the
+                       cell, so no per-cell glyph is needed. */
                     className={`h-10 min-w-0 rounded text-sm font-bold transition-opacity
                       ${
                         used
