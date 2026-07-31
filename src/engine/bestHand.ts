@@ -20,7 +20,7 @@ export const HOLE_SIZES = [2, 4, 5] as const;
 export type HoleSize = (typeof HOLE_SIZES)[number];
 
 export const GAME_LABELS: Record<HoleSize, string> = {
-  2: "Hold'em",
+  2: 'NLH',
   4: 'PLO4',
   5: 'PLO5',
 };

@@ -22,20 +22,22 @@ const hand = (s: string): Card[] => parseCards(s);
 // ---------------------------------------------------------------------------
 
 describe("Hold'em selection reaches the right category", () => {
-  const CASES: Array<[string, string, HandCategory]> = [
-    ['Ah Kh', 'Qh Jh Th 2c 3d', HandCategory.StraightFlush],
-    ['As Ad', 'Ac Ah 9s 4d 2c', HandCategory.Quads],
-    ['As Ad', 'Ac 9s 9d 4c 2h', HandCategory.FullHouse],
-    ['Ah 2h', '9h 5h Kh 7s 3d', HandCategory.Flush],
-    ['9c 8d', '7h 6s 5c 2d Ah', HandCategory.Straight],
-    ['As Ad', 'Ac 7h 4s 2d 9c', HandCategory.Trips],
-    ['As Kd', 'Ah Kc 4s 2d 9h', HandCategory.TwoPair],
-    ['As Kd', 'Ah 7c 4s 2d 9h', HandCategory.Pair],
-    ['As Qd', 'Jh 7c 4s 2d 9h', HandCategory.HighCard],
+  // Name is spelled out rather than reverse-mapped: HandCategory is a const
+  // enum, so it has no runtime reverse lookup.
+  const CASES: Array<[string, string, string, HandCategory]> = [
+    ['straight flush', 'Ah Kh', 'Qh Jh Th 2c 3d', HandCategory.StraightFlush],
+    ['quads', 'As Ad', 'Ac Ah 9s 4d 2c', HandCategory.Quads],
+    ['full house', 'As Ad', 'Ac 9s 9d 4c 2h', HandCategory.FullHouse],
+    ['flush', 'Ah 2h', '9h 5h Kh 7s 3d', HandCategory.Flush],
+    ['straight', '9c 8d', '7h 6s 5c 2d Ah', HandCategory.Straight],
+    ['trips', 'As Ad', 'Ac 7h 4s 2d 9c', HandCategory.Trips],
+    ['two pair', 'As Kd', 'Ah Kc 4s 2d 9h', HandCategory.TwoPair],
+    ['pair', 'As Kd', 'Ah 7c 4s 2d 9h', HandCategory.Pair],
+    ['high card', 'As Qd', 'Jh 7c 4s 2d 9h', HandCategory.HighCard],
   ];
 
-  for (const [hole, board, category] of CASES) {
-    it(`${hole} on ${board} is ${HandCategory[category]}`, () => {
+  for (const [name, hole, board, category] of CASES) {
+    it(`${hole} on ${board} is a ${name}`, () => {
       expect(categoryOf(bestHoldemValue(hand(hole), hand(board)))).toBe(category);
     });
   }

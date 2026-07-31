@@ -283,7 +283,7 @@ export default function Home() {
 
             <div className="flex rounded-lg overflow-hidden control-stroke border-line-2">
               {[
-                { label: 'Double board', value: true },
+                { label: 'Double', value: true },
                 { label: 'Single', value: false },
               ].map((opt) => (
                 <button
