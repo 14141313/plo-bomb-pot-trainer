@@ -447,7 +447,10 @@ export default function Home() {
                   /* Square, matching the card height (h-8), and always flush
                      right. The equity block carries ml-auto when it exists, so
                      this only needs it when there is no equity yet. */
-                  className={`${pe ? 'ml-1' : 'ml-auto'} w-8 h-8 shrink-0 rounded-lg control-stroke border-line-2 text-ink-3 hover:bg-surface-2 hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed`}
+                  /* Same stroke and glyph colour as the empty card slots it
+                     sits beside — line-2/ink-3 were too faint against the
+                     row. */
+                  className={`${pe ? 'ml-1' : 'ml-auto'} w-8 h-8 shrink-0 rounded-lg control-stroke border-edge text-edge hover:border-foreground hover:text-foreground hover:bg-surface-2 disabled:opacity-30 disabled:cursor-not-allowed`}
                 >
                   ×
                 </button>
