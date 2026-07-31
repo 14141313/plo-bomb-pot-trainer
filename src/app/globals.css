@@ -230,6 +230,26 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/*
+ * One stroke weight for every interactive control — buttons, inputs, card
+ * slots, segmented toggles. Defined once here rather than repeated per
+ * component so the weight is a single decision. Pair it with a border-*
+ * colour utility; this only sets the width.
+ *
+ * Not applied to non-interactive chrome (seat pills, card backs), which stay
+ * hairline so they don't compete with the controls at small sizes.
+ */
+@utility control-stroke {
+  /*
+   * Declared 1.5px. Chromium and WebKit floor border-width to whole CSS
+   * pixels, so this paints as 1px there — verified by measuring rendered
+   * geometry: a 1.5px border box is the same height as a 1px one, while 2px
+   * is visibly taller. Engines that support fractional borders get 1.5.
+   * Change this one value to 2px if a heavier stroke is wanted everywhere.
+   */
+  border-width: 1.5px;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

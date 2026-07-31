@@ -28,7 +28,7 @@ interface ActionBarProps {
 const BUTTON =
   // /55, not /45: at 45% the stroke measures 2.96:1 on the page background,
   // just under the 3:1 floor for a UI component boundary.
-  'flex-1 min-w-0 px-1 py-2 rounded-lg border border-foreground/55 bg-transparent ' +
+  'flex-1 min-w-0 px-1 py-2 rounded-lg control-stroke border-foreground/55 bg-transparent ' +
   'text-foreground font-semibold hover:bg-foreground/10 active:bg-foreground/20 transition-colors';
 
 /** Label + optional bb amount underneath, on a fixed two-line frame. */

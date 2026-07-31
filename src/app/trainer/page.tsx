@@ -264,7 +264,7 @@ export default function TrainerPage() {
             Trainer is fixed at {TRAINER_PLAYER_COUNT}-handed for now.
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <div className="flex rounded-lg overflow-hidden border border-line-2">
+            <div className="flex rounded-lg overflow-hidden control-stroke border-line-2">
               {([4, 5] as const).map((v) => (
                 <button
                   key={v}
@@ -278,7 +278,7 @@ export default function TrainerPage() {
                 </button>
               ))}
             </div>
-            <div className="flex rounded-lg overflow-hidden border border-line-2">
+            <div className="flex rounded-lg overflow-hidden control-stroke border-line-2">
               {[
                 { label: 'Double board', value: true },
                 { label: 'Single', value: false },
@@ -433,7 +433,7 @@ export default function TrainerPage() {
               <button
                 type="button"
                 onClick={() => setHand(null)}
-                className="w-full py-2 rounded-lg border border-line-2 font-medium"
+                className="w-full py-2 rounded-lg control-stroke border-line-2 font-medium"
               >
                 Change setup
               </button>

@@ -263,7 +263,7 @@ export default function Home() {
           </div>
 
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-            <div className="flex rounded-lg overflow-hidden border border-line-2">
+            <div className="flex rounded-lg overflow-hidden control-stroke border-line-2">
               {([4, 5] as const).map((v) => (
                 <button
                   key={v}
@@ -280,7 +280,7 @@ export default function Home() {
               ))}
             </div>
 
-            <div className="flex rounded-lg overflow-hidden border border-line-2">
+            <div className="flex rounded-lg overflow-hidden control-stroke border-line-2">
               {[
                 { label: 'Double board', value: true },
                 { label: 'Single', value: false },
@@ -358,14 +358,14 @@ export default function Home() {
                   className={`flex-1 text-sm px-2 py-2 rounded-lg font-semibold transition-colors ${
                     available
                       ? dealt
-                        ? 'border border-accent text-accent-text hover:bg-accent/10'
+                        ? 'control-stroke border-accent text-accent-text hover:bg-accent/10'
                         : 'bg-accent hover:bg-accent/85 text-accent-fg'
                       : // Disabled: the stroke mutes too, not just the label.
                         // Fixed --edge rather than a mode-flipping line token,
                         // because the felt underneath is light in BOTH themes,
                         // so a flipping border would read dark and prominent in
                         // dark mode - the opposite of disabled.
-                        'border border-edge text-edge cursor-not-allowed'
+                        'control-stroke border-edge text-edge cursor-not-allowed'
                   }`}
                 >
                   {dealt ? 'Redeal' : 'Deal'} {street}
@@ -447,7 +447,7 @@ export default function Home() {
                   /* Square, matching the card height (h-8), and always flush
                      right. The equity block carries ml-auto when it exists, so
                      this only needs it when there is no equity yet. */
-                  className={`${pe ? 'ml-1' : 'ml-auto'} w-8 h-8 shrink-0 rounded-lg border border-line-2 text-ink-3 hover:bg-surface-2 hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed`}
+                  className={`${pe ? 'ml-1' : 'ml-auto'} w-8 h-8 shrink-0 rounded-lg control-stroke border-line-2 text-ink-3 hover:bg-surface-2 hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed`}
                 >
                   ×
                 </button>
@@ -461,7 +461,7 @@ export default function Home() {
             type="button"
             onClick={addPlayer}
             disabled={playerCount >= 8}
-            className="py-2 rounded-xl border border-line-2 text-sm font-medium text-ink-2 hover:bg-surface-2 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="py-2 rounded-xl control-stroke border-line-2 text-sm font-medium text-ink-2 hover:bg-surface-2 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             + Add player
           </button>
@@ -505,7 +505,7 @@ export default function Home() {
                 onChange={(e) => setPotOverride(Number(e.target.value))}
                 /* text-base on mobile: iOS Safari zooms the whole page when an
                    input's text is under 16px. */
-                className="nums w-16 rounded border border-line-2 bg-transparent px-1 py-0.5 text-right text-base sm:text-xs"
+                className="nums w-16 rounded control-stroke border-line-2 bg-transparent px-1 py-0.5 text-right text-base sm:text-xs"
               />
               bb
             </label>
@@ -589,7 +589,7 @@ export default function Home() {
             <button
               type="button"
               onClick={endHand}
-              className="flex-1 py-2 rounded-lg border border-line-2 hover:bg-surface-2 font-semibold text-sm"
+              className="flex-1 py-2 rounded-lg control-stroke border-line-2 hover:bg-surface-2 font-semibold text-sm"
             >
               End Hand
             </button>

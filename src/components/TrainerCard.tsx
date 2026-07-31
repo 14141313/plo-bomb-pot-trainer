@@ -71,7 +71,7 @@ export function TrainerCard({ card, size = 'md', onClick, active }: TrainerCardP
         type="button"
         onClick={onClick}
         aria-label="Empty card slot"
-        className={`${base} ${ring} border border-edge text-edge hover:border-foreground`}
+        className={`${base} ${ring} control-stroke border-edge text-edge hover:border-foreground`}
       >
         +
       </button>

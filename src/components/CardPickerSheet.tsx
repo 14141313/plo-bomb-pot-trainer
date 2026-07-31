@@ -54,14 +54,14 @@ export function CardPickerSheet({
             <button
               type="button"
               onClick={onClear}
-              className="text-xs px-2 py-1 rounded border border-line-2 text-ink-2 hover:bg-surface-2"
+              className="text-xs px-2 py-1 rounded control-stroke border-line-2 text-ink-2 hover:bg-surface-2"
             >
               Clear slot
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="text-xs px-2 py-1 rounded border border-line-2 text-ink-2 hover:bg-surface-2"
+              className="text-xs px-2 py-1 rounded control-stroke border-line-2 text-ink-2 hover:bg-surface-2"
             >
               Done
             </button>
