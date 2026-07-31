@@ -297,6 +297,49 @@ directly contradicts the later instruction to make the action bar neutral
 grade. The neutral bar was kept and the colour-coding was **not** reintroduced.
 Flag if the brief should win.
 
+## Hold'em (2-card) support
+
+A third hand type alongside PLO4/PLO5, on both tabs and both board counts.
+
+- **Evaluation.** `holdem.ts` adds best-5-of-7 (C(7,5) = 21 on a full board,
+  6 on the turn, 1 on the flop). The 5-card ranker is untouched and shared —
+  only the *selection* rule differs.
+- **Dispatch by hole-card count, not a game flag.** `bestHand.ts` routes on
+  `hole.length`: 2 is only ever Hold'em, 4 or 5 only ever Omaha, so the two
+  cannot disagree. A separate setting could drift from the cards actually
+  dealt; this can't.
+- Everything downstream is unchanged — Monte Carlo, exact enumeration,
+  double-board scoring, EV and pot odds all just call through the dispatcher.
+
+### Validation (same three checks as the Omaha engine)
+
+- **Hierarchy** through the Hold'em selector: all nine categories, the wheel
+  played with one hole card, and a flop where only one combination exists.
+- **Convergence**: heads-up flop-to-river, exact enumeration is C(45,2) = 990
+  runouts; Monte Carlo at the shipped iteration count lands within 1pp across
+  6 seeds.
+- **Double-board summation** on three Hold'em scenarios (heads-up flops,
+  6-handed preflop, 4-handed complete rivers): equities sum to 100% overall
+  and per board, and combined equals the mean of the two boards.
+- Plus a naive best-5-of-7 reference cross-checked over 3,000 random hands,
+  and rule-difference tests proving Hold'em *can* play the board and make a
+  flush with one suited hole card where Omaha cannot.
+
+26 new tests, 130 total.
+
+### Open questions, resolved
+
+- **Ante presets: unchanged.** The existing 2-10bb range already spans small
+  Hold'em bomb pot antes; a per-hand-type preset set would add a setting
+  without adding reach.
+- **Opponent tiers: unchanged.** They key off equity as a *ratio to an equal
+  pot share*, which self-normalises, and the concern about compressed Hold'em
+  equities mostly applies preflop. The trainer only ever plays postflop, where
+  Hold'em equities are if anything more polarised than PLO. Worth revisiting
+  with real hands rather than guessing new thresholds now.
+- **2-card layout:** checked on both tabs. Hero cards stay centred and the
+  seat card-backs follow the hand size, so nothing reads as sparse.
+
 ## Queued next
 
 1. **Supabase** (blocked on project creation + keys): magic-link auth gating

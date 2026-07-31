@@ -13,7 +13,7 @@
 
 import type { Card } from './cards';
 import { mulberry32 } from './cards';
-import { bestOmahaValue } from './omaha';
+import { HOLE_SIZES, bestHandValue, type HoleSize } from './bestHand';
 
 /**
  * Default pot share per board in double-board mode. Bomb pot convention is
@@ -28,7 +28,10 @@ const MAX_ENUMERATION_OUTCOMES = 2500;
 export const DEFAULT_ITERATIONS = 20_000;
 
 export interface EquityOptions {
-  /** Complete hole cards per player: 4 (PLO4) or 5 (PLO5) cards each. */
+  /**
+   * Complete hole cards per player: 2 (Hold'em), 4 (PLO4) or 5 (PLO5) each.
+   * The count also selects the hand-evaluation rule — see bestHand.ts.
+   */
   players: ReadonlyArray<readonly Card[]>;
   /** 1 board (single) or 2 boards (double). Each 0, 3, 4, or 5 cards. */
   boards: ReadonlyArray<readonly Card[]>;
@@ -76,8 +79,8 @@ function validate(opts: EquityOptions): void {
   if (boards.length < 1 || boards.length > 2) throw new Error('Need 1 or 2 boards');
 
   const holeSize = players[0].length;
-  if (holeSize !== 4 && holeSize !== 5) {
-    throw new Error(`Hole cards must be 4 or 5, got ${holeSize}`);
+  if (!HOLE_SIZES.includes(holeSize as HoleSize)) {
+    throw new Error(`Hole cards must be 2, 4 or 5, got ${holeSize}`);
   }
   for (const p of players) {
     if (p.length !== holeSize) throw new Error('All players must have the same hand size');
@@ -154,7 +157,7 @@ export function calculateEquity(opts: EquityOptions): EquityResult {
       const board = fullBoards[b];
       let best = -1;
       for (let p = 0; p < nPlayers; p++) {
-        const v = bestOmahaValue(players[p], board);
+        const v = bestHandValue(players[p], board);
         values[p] = v;
         if (v > best) best = v;
       }

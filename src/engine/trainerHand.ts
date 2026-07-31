@@ -13,6 +13,7 @@ import type { Card } from './cards';
 import { makeDeck, mulberry32 } from './cards';
 import { BET_FRACTIONS, allInTo, antePot, effectiveStack, raiseTo, betSize } from './betting';
 import { decideAction, type OpponentView } from './opponent';
+import type { HoleSize } from './bestHand';
 import type { ActionKind } from './scoring';
 
 export type Street = 'flop' | 'turn' | 'river';
@@ -32,8 +33,8 @@ export interface HandAction {
 
 export interface HandConfig {
   playerCount: number;
-  /** 4 = PLO4, 5 = PLO5. */
-  variant: 4 | 5;
+  /** Hole cards per player: 2 (Hold'em), 4 (PLO4) or 5 (PLO5). */
+  variant: HoleSize;
   ante: number;
   doubleBoard: boolean;
 }

@@ -14,6 +14,7 @@ import { ActionBar } from '@/components/ActionBar';
 import { PokerTable, type SeatView } from '@/components/PokerTable';
 import { useEquity } from '@/hooks/useEquity';
 import { ANTE_PRESETS } from '@/engine/betting';
+import { GAME_LABELS, HOLE_SIZES } from '@/engine/bestHand';
 import { DEFAULT_ITERATIONS } from '@/engine/equity';
 import { continueProbability } from '@/engine/opponent';
 import { positionLabels } from '@/lib/positions';
@@ -265,7 +266,7 @@ export default function TrainerPage() {
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <div className="flex rounded-lg overflow-hidden control-stroke border-line-2">
-              {([4, 5] as const).map((v) => (
+              {HOLE_SIZES.map((v) => (
                 <button
                   key={v}
                   type="button"
@@ -274,7 +275,7 @@ export default function TrainerPage() {
                     config.variant === v ? 'bg-accent text-accent-fg' : 'bg-transparent'
                   }`}
                 >
-                  PLO{v}
+                  {GAME_LABELS[v]}
                 </button>
               ))}
             </div>

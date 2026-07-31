@@ -19,12 +19,13 @@ import {
 import { useEquity } from '@/hooks/useEquity';
 import { TrainerCard } from "@/components/TrainerCard";
 import { CardPickerSheet } from '@/components/CardPickerSheet';
+import { GAME_LABELS, HOLE_SIZES, type HoleSize } from '@/engine/bestHand';
 
 type Slot =
   | { kind: 'hand'; player: number; index: number }
   | { kind: 'board'; board: number; index: number };
 
-type Variant = 4 | 5;
+type Variant = HoleSize;
 
 const emptyHands = (players: number, variant: Variant): (Card | null)[][] =>
   Array.from({ length: players }, () => Array<Card | null>(variant).fill(null));
@@ -264,7 +265,7 @@ export default function Home() {
 
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
             <div className="flex rounded-lg overflow-hidden control-stroke border-line-2">
-              {([4, 5] as const).map((v) => (
+              {HOLE_SIZES.map((v) => (
                 <button
                   key={v}
                   type="button"
@@ -275,7 +276,7 @@ export default function Home() {
                       : 'bg-transparent hover:bg-surface-2'
                   }`}
                 >
-                  PLO{v}
+                  {GAME_LABELS[v]}
                 </button>
               ))}
             </div>
