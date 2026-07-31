@@ -260,17 +260,17 @@ export default function Home() {
 
         {/* Table setup */}
         <section className="rounded-xl bg-surface p-3 flex flex-col gap-3">
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-2 text-sm">
           </div>
 
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-2 text-sm">
             <div className="flex rounded-lg overflow-hidden control-stroke border-line-2">
               {HOLE_SIZES.map((v) => (
                 <button
                   key={v}
                   type="button"
                   onClick={() => changeVariant(v)}
-                  className={`px-3 py-1 text-sm font-medium ${
+                  className={`px-2.5 py-1 text-sm font-medium ${
                     variant === v
                       ? 'bg-accent text-accent-fg'
                       : 'bg-transparent hover:bg-surface-2'
@@ -290,7 +290,7 @@ export default function Home() {
                   key={opt.label}
                   type="button"
                   onClick={() => setDoubleBoard(opt.value)}
-                  className={`px-3 py-1 text-sm font-medium ${
+                  className={`px-2.5 py-1 text-sm font-medium ${
                     doubleBoard === opt.value
                       ? 'bg-accent text-accent-fg'
                       : 'bg-transparent hover:bg-surface-2'

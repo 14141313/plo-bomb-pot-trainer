@@ -271,7 +271,7 @@ export default function TrainerPage() {
                   key={v}
                   type="button"
                   onClick={() => setConfig((c) => ({ ...c, variant: v }))}
-                  className={`px-3 py-1 font-medium ${
+                  className={`px-2.5 py-1 font-medium ${
                     config.variant === v ? 'bg-accent text-accent-fg' : 'bg-transparent'
                   }`}
                 >
@@ -288,7 +288,7 @@ export default function TrainerPage() {
                   key={o.label}
                   type="button"
                   onClick={() => setConfig((c) => ({ ...c, doubleBoard: o.value }))}
-                  className={`px-3 py-1 font-medium ${
+                  className={`px-2.5 py-1 font-medium ${
                     config.doubleBoard === o.value ? 'bg-accent text-accent-fg' : 'bg-transparent'
                   }`}
                 >
