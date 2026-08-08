@@ -340,6 +340,42 @@ A third hand type alongside PLO4/PLO5, on both tabs and both board counts.
 - **2-card layout:** checked on both tabs. Hero cards stay centred and the
   seat card-backs follow the hand size, so nothing reads as sparse.
 
+## Design capture routes
+
+`/design-preview/*` renders each app state fully populated with fixed mock
+data, so a static capture tool can reach states that normally only exist
+after interaction. `/design-preview` indexes them. Not linked from the
+product and marked `noindex` in the route group's metadata.
+
+To make this possible without duplicating markup, the Tool and Trainer page
+bodies moved to `src/components/app/{ToolApp,TrainerApp}.tsx` and take an
+optional `seed` prop; `/tool` and `/trainer` are now thin wrappers that pass
+nothing. **The previews render the real components**, so they cannot drift
+from the product the way a hand-built mock would.
+
+| Route | State |
+| --- | --- |
+| `tool-empty` | Tool, default |
+| `tool-dealt` | 4 hands, both boards to the turn, equity live |
+| `tool-card-picker` | Card picker sheet (the only modal in the product) |
+| `trainer-setup` | Pre-deal config |
+| `trainer-facing-bet` | Flop, hero facing 21bb, chips out, action bar live |
+| `trainer-showdown` | Both boards complete, showdown hands revealed, graded |
+| `trainer-history-list` | Session list, 8 hands, mixed grades |
+| `trainer-hand-detail` | One hand expanded, street by street, with the list |
+
+Notes for whoever picks this up:
+
+- Equity in the previews is **computed for real** from the mock cards rather
+  than hard-coded, so the percentages are internally consistent.
+- `trainer-facing-bet` sets `toAct` to the hero deliberately. If it pointed at
+  an opponent the auto-advance effect would fire and the captured state would
+  move under the capture tool.
+- Hand history is not a persisted feature yet (still blocked on Supabase).
+  States 6 and 7 render the **session list and hand review**, which are the
+  built surfaces closest to it. When persistence lands, point these at the
+  real history rather than inventing UI now.
+
 ## Queued next
 
 1. **Supabase** (blocked on project creation + keys): magic-link auth gating
