@@ -336,7 +336,7 @@ export function ToolApp({ seed }: { seed?: ToolSeed } = {}) {
         </section>
 
         {/* Boards */}
-        <section className="rounded-xl bg-felt text-seat p-3 flex flex-col gap-3 shadow-[0_2px_4px_rgba(0,0,0,0.10),0_10px_30px_rgba(0,0,0,0.18)]">
+        <section className="rounded-[18px] bg-felt text-seat p-3 flex flex-col gap-3 shadow-[0_2px_4px_rgba(0,0,0,0.10),0_10px_30px_rgba(0,0,0,0.18)]">
           {Array.from({ length: nBoards }, (_, b) => (
             <div key={b} className="flex items-center gap-2">
               <span className="w-14 text-xs font-medium text-rail shrink-0">
@@ -402,7 +402,7 @@ export function ToolApp({ seed }: { seed?: ToolSeed } = {}) {
             return (
               <div
                 key={p}
-                className="rounded-xl bg-surface p-2.5 flex flex-wrap items-center gap-2"
+                className="rounded-[14px] bg-surface p-2.5 flex flex-wrap items-center gap-2"
               >
                 <div className="w-9 shrink-0">
                   <div className="text-sm font-semibold">{positions[p]}</div>
@@ -489,7 +489,7 @@ export function ToolApp({ seed }: { seed?: ToolSeed } = {}) {
               <>
                 <span className="inline-block w-24 h-1.5 rounded bg-surface-2 overflow-hidden">
                   <span
-                    className="block h-full bg-accent transition-all"
+                    className="block h-full bg-accent transition-[width]"
                     style={{ width: `${progress * 100}%` }}
                   />
                 </span>
@@ -549,7 +549,7 @@ export function ToolApp({ seed }: { seed?: ToolSeed } = {}) {
                   : 'border-line-2 hover:bg-surface-2'
               }`}
             >
-              All-In
+              All-in
             </button>
           </div>
           {heroBet !== null && requiredEq !== null && (
@@ -597,7 +597,7 @@ export function ToolApp({ seed }: { seed?: ToolSeed } = {}) {
             <button
               type="button"
               onClick={dealHands}
-              className="flex-1 py-2 rounded-lg bg-accent hover:bg-accent/85 text-accent-fg font-semibold text-sm"
+              className="flex-1 py-2 rounded-lg bg-accent hover:bg-accent/85 active:scale-[0.96] transition-[colors,scale] text-accent-fg font-semibold text-sm"
             >
               Deal hands
             </button>
@@ -606,7 +606,7 @@ export function ToolApp({ seed }: { seed?: ToolSeed } = {}) {
               onClick={endHand}
               className="flex-1 py-2 rounded-lg control-stroke border-line-2 hover:bg-surface-2 font-semibold text-sm"
             >
-              End Hand
+              End hand
             </button>
           </div>
         </div>

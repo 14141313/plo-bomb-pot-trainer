@@ -6,9 +6,65 @@
  * prevention lives here, at the point of entry.
  */
 
+import { useEffect, useRef } from 'react';
 import type { Card } from '@/engine/cards';
 import { RANKS, makeCard } from '@/engine/cards';
 import { suitBgClass, suitSymbol, suitTextClass } from './TrainerCard';
+
+/**
+ * Standard modal keyboard contract: focus moves in on open, Tab cycles inside
+ * the sheet, Escape closes, and focus returns to whatever opened it.
+ *
+ * Without the trap, focus stayed on the trigger behind the scrim and reaching
+ * the grid took 29 tab stops through content the user cannot see. The trap is
+ * what makes `aria-modal` honest — it is why the background does not also need
+ * `inert`, which would be awkward here since the sheet renders inside `main`.
+ */
+function useModalKeyboard(ref: React.RefObject<HTMLDivElement | null>, onClose: () => void) {
+  useEffect(() => {
+    const opener = document.activeElement as HTMLElement | null;
+    const focusables = () =>
+      Array.from(
+        ref.current?.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        ) ?? [],
+      );
+
+    focusables()[0]?.focus();
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+        return;
+      }
+      if (e.key !== 'Tab') return;
+      const items = focusables();
+      if (items.length === 0) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      const active = document.activeElement;
+      // Wrap at both ends, and pull focus back in if it escaped entirely.
+      if (e.shiftKey && (active === first || !ref.current?.contains(active))) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (active === last || !ref.current?.contains(active))) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener('keydown', onKeyDown);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = previousOverflow;
+      opener?.focus?.();
+    };
+  }, [ref, onClose]);
+}
 
 /** Column order: spades, hearts, diamonds, clubs. */
 const SUIT_ORDER = [3, 2, 1, 0] as const;
@@ -30,14 +86,19 @@ export function CardPickerSheet({
   onClear,
   onClose,
 }: CardPickerSheetProps) {
+  const sheetRef = useRef<HTMLDivElement>(null);
+  useModalKeyboard(sheetRef, onClose);
+
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center sm:justify-center">
-      <button
-        type="button"
-        aria-label="Close picker"
-        className="absolute inset-0 bg-black/40"
-        onClick={onClose}
-      />
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Pick a card for ${targetLabel}`}
+      className="fixed inset-0 z-50 flex items-end sm:items-center sm:justify-center"
+    >
+      {/* Scrim is not a tab stop: Escape and the Done button close the sheet,
+          and a focusable scrim would sit between the trigger and the grid. */}
+      <div aria-hidden="true" className="absolute inset-0 bg-black/40" onClick={onClose} />
       {/* Four columns need far less width than thirteen, so the sheet goes
           back to a comfortable reading width and is capped on desktop rather
           than stretched. */}
@@ -45,7 +106,7 @@ export function CardPickerSheet({
           height is left, so the deck shows in full when it fits and only
           scrolls on genuinely short screens. dvh, not vh, so mobile Safari's
           collapsing address bar doesn't cause a phantom overflow. */}
-      <div className="relative w-full sm:w-auto sm:min-w-[360px] sm:max-w-[420px] max-h-[96dvh] flex flex-col bg-surface rounded-t-2xl sm:rounded-2xl p-3 sm:p-4 shadow-xl">
+      <div ref={sheetRef} className="relative w-full sm:w-auto sm:min-w-[360px] sm:max-w-[420px] max-h-[96dvh] flex flex-col bg-surface rounded-t-2xl sm:rounded-2xl p-3 sm:p-4 shadow-xl">
         <div className="flex items-center justify-between mb-3 shrink-0">
           <span className="text-sm font-medium text-ink-2">
             Pick: {targetLabel}
@@ -74,7 +135,7 @@ export function CardPickerSheet({
           roughly 85px per cell, so every target clears 40x40 in both
           dimensions; the cost is 13 rows, hence the scroll.
         */}
-        <div className="grid grid-cols-4 gap-1 flex-1 min-h-0 auto-rows-min overflow-y-auto">
+        <div className="grid grid-cols-4 gap-1 flex-1 min-h-0 auto-rows-min overflow-y-auto overscroll-contain">
           {SUIT_ORDER.map((suit) => (
             <span
               key={`head-${suit}`}

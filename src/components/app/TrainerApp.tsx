@@ -327,7 +327,7 @@ export function TrainerApp({ seed }: { seed?: TrainerSeed } = {}) {
           <button
             type="button"
             onClick={startHand}
-            className="mt-1 w-full py-2.5 rounded-lg bg-accent hover:bg-accent/85 text-accent-fg font-semibold"
+            className="mt-1 w-full py-2.5 rounded-lg bg-accent hover:bg-accent/85 active:scale-[0.96] transition-[colors,scale] text-accent-fg font-semibold"
           >
             Deal hand
           </button>
@@ -364,14 +364,31 @@ export function TrainerApp({ seed }: { seed?: TrainerSeed } = {}) {
 
           {!hand.complete && (
             <section>
+              {/*
+                One stable live region rather than a message that appears and
+                disappears: a region already in the DOM announces reliably when
+                its text changes, whereas inserting the node and its text at the
+                same moment is frequently missed. This is how a screen-reader
+                user learns the hand has reached them — the turn arrives on a
+                timer, with no action of theirs to tie it to.
+              */}
+              <div role="status" aria-live="polite" className="sr-only">
+                {!heroTurn
+                  ? running || !equities
+                    ? 'Calculating equity'
+                    : 'Opponents acting'
+                  : scored && scored.toCall > 0
+                    ? `Your turn. Facing ${scored.toCall.toFixed(1)} big blinds into ${hand.pot.toFixed(1)}.`
+                    : 'Your turn. Checked to you.'}
+              </div>
               {!heroTurn && (
-                <div className="text-ink-3 text-xs py-3 text-center">
+                <div aria-hidden="true" className="text-ink-3 text-xs py-3 text-center">
                   {running || !equities ? 'Calculating equity…' : 'Opponents acting…'}
                 </div>
               )}
               {heroTurn && scored && (
                 <>
-                  <div className="text-xs text-ink-3 mb-2">
+                  <div aria-hidden="true" className="text-xs text-ink-3 mb-2">
                     {scored.toCall > 0
                       ? `Facing ${scored.toCall.toFixed(1)}bb into ${hand.pot.toFixed(1)}bb`
                       : 'Checked to you'}
@@ -391,7 +408,7 @@ export function TrainerApp({ seed }: { seed?: TrainerSeed } = {}) {
 
           {hand.complete && (
             <section className="rounded-xl p-3 flex flex-col gap-3">
-              <div className="font-semibold">Hand review</div>
+              <h2 className="font-semibold">Hand review</h2>
 
               <div className="text-xs text-ink-3">
                 Hands that reached showdown are revealed at their seats above;
@@ -437,7 +454,7 @@ export function TrainerApp({ seed }: { seed?: TrainerSeed } = {}) {
               <button
                 type="button"
                 onClick={startHand}
-                className="w-full py-2.5 rounded-lg bg-accent hover:bg-accent/85 text-accent-fg font-semibold"
+                className="w-full py-2.5 rounded-lg bg-accent hover:bg-accent/85 active:scale-[0.96] transition-[colors,scale] text-accent-fg font-semibold"
               >
                 Next hand
               </button>
@@ -456,7 +473,7 @@ export function TrainerApp({ seed }: { seed?: TrainerSeed } = {}) {
       {session.length > 0 && (
         <section className="nums rounded-xl p-3">
           <div className="flex items-center gap-2 mb-2">
-            <span className="font-semibold">Session</span>
+            <h2 className="font-semibold">Session</h2>
             {sessionGrade && <GradePill grade={sessionGrade} />}
             <span className="ml-auto text-xs text-ink-3">
               {session.length} hand{session.length === 1 ? '' : 's'} · {sessionLoss.toFixed(2)}bb
@@ -475,7 +492,7 @@ export function TrainerApp({ seed }: { seed?: TrainerSeed } = {}) {
             ))}
           </div>
           <p className="mt-2 text-[11px] text-ink-3">
-            Session only — hands are not saved yet. Sign-in and history land with Supabase.
+            Hands aren&rsquo;t saved yet. Sign in to keep your history.
           </p>
         </section>
       )}
