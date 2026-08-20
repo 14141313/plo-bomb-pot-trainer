@@ -23,33 +23,33 @@
 
 :root {
   /*
-   * Light only. Declaring color-scheme stops the browser applying its own
-   * dark styling to form controls and scrollbars for visitors whose OS is in
-   * dark mode — without it the pot input would render dark against a light
-   * page, since the app no longer ships a dark palette to match.
+   * Dark only — one palette, no OS switching. Declaring color-scheme keeps
+   * the browser's own chrome (form controls, scrollbars, the pot number
+   * input) dark to match, instead of painting light controls on a dark page
+   * for visitors whose OS is set to light.
    */
-  color-scheme: light;
+  color-scheme: dark;
 
   /* Page chrome */
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0a0a0a;
+  --foreground: #ededed;
 
-  /* Neutrals. Semantic tokens replace every stock zinc-*
-     utility, so components carry no colour pairs and every neutral
-     traces here. Hue 286 matches the seat/felt family. */
-  --surface: #ffffff;
-  --surface-2: #f4f4f5;
-  --line: #e4e4e7;
-  --line-2: #d4d4d8;
-  --ink-2: #52525b;
-  --ink-3: #71717a;
+  /* Neutrals. Semantic tokens replace every stock zinc-* utility, so no
+     component hard-codes a grey and every neutral traces back here. Hue 286
+     matches the seat/felt family. */
+  --surface: #18181b;
+  --surface-2: #27272a;
+  --line: #27272a;
+  --line-2: #3f3f46;
+  --ink-2: #d4d4d8;
+  --ink-3: #a1a1aa;
   --edge: #a1a1aa;
 
   /* Verdict pills (CALL/FOLD, optimal/costly): palette hues 156.7 and 25. */
-  --good-bg: #d8f3e4;
-  --good-fg: #14684a;
-  --bad-bg: #fde3e0;
-  --bad-fg: #a01f1f;
+  --good-bg: #143a2b;
+  --good-fg: #7fd7ac;
+  --bad-bg: #45191b;
+  --bad-fg: #f5a09a;
 
   /* Card suits.
      Lightness sits in a BAND (0.52-0.58), not one value: forcing all four to
@@ -82,13 +82,13 @@
   /* State.
      Accent is the brand blue, hue 266.1 — the diamonds family. It was amber
      (Tailwind's stock hue wearing OKLCH syntax); an accent has to trace to
-     the palette, and the yellow band is deliberately not in it. White on it
-     measures 5.08:1. --accent-text carries the same value but is its own
-     token because it styles text and borders rather than fills, so it can be
-     retuned without moving the button colour. */
+     the palette, and the yellow band is deliberately not in it. --accent-text
+     is a lighter step than the fill: the same blue that reads well as a
+     button colour is too dark for text sitting directly on the near-black
+     page. */
   --accent: #305dff;
   --accent-fg: #ffffff;
-  --accent-text: #305dff;
+  --accent-text: #4372ff;
   /* State tokens sit IN the palette rather than being inherited from
      Tailwind: to-act shares the accent hue (266.1) so the action glow and the
      accent read as one family; hero shares the clubs hue (156.7); leader
@@ -100,21 +100,21 @@
 
 @supports (color: oklch(0 0 0)) {
   :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.205 0 0);
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.946 0 0);
 
-    --surface: oklch(1 0 0);
-    --surface-2: oklch(0.967 0.001 286.4);
-    --line: oklch(0.92 0.004 286.3);
-    --line-2: oklch(0.871 0.005 286.3);
-    --ink-2: oklch(0.442 0.015 285.8);
-    --ink-3: oklch(0.552 0.014 285.9);
+    --surface: oklch(0.21 0.006 285.9);
+    --surface-2: oklch(0.274 0.005 286);
+    --line: oklch(0.274 0.005 286);
+    --line-2: oklch(0.37 0.012 285.8);
+    --ink-2: oklch(0.871 0.005 286.3);
+    --ink-3: oklch(0.712 0.013 286.1);
     --edge: oklch(0.712 0.013 286.1);
 
-    --good-bg: oklch(0.95 0.045 156.7);
-    --good-fg: oklch(0.45 0.11 156.7);
-    --bad-bg: oklch(0.93 0.04 25);
-    --bad-fg: oklch(0.48 0.16 25);
+    --good-bg: oklch(0.32 0.06 156.7);
+    --good-fg: oklch(0.82 0.13 156.7);
+    --bad-bg: oklch(0.3 0.08 25);
+    --bad-fg: oklch(0.78 0.11 25);
 
     --suit-spades: oklch(0.52 0 89.9);
     --suit-clubs: oklch(0.55 0.132 156.7);
@@ -136,7 +136,7 @@
 
     --accent: oklch(0.555 0.245 266.1);
     --accent-fg: oklch(1 0 0);
-    --accent-text: oklch(0.555 0.245 266.1);
+    --accent-text: oklch(0.6 0.217 266.1);
     --to-act: oklch(0.78 0.1 266.1);
     --hero: oklch(0.77 0.166 156.7);
     --leader: oklch(0.555 0.124 55);
