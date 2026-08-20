@@ -22,12 +22,20 @@
    ------------------------------------------------------------------------ */
 
 :root {
+  /*
+   * Light only. Declaring color-scheme stops the browser applying its own
+   * dark styling to form controls and scrollbars for visitors whose OS is in
+   * dark mode — without it the pot input would render dark against a light
+   * page, since the app no longer ships a dark palette to match.
+   */
+  color-scheme: light;
+
   /* Page chrome */
   --background: #ffffff;
   --foreground: #171717;
 
-  /* Neutrals. Semantic, mode-flipping tokens replace every stock zinc-*
-     utility, so components carry no dark: colour pairs and every neutral
+  /* Neutrals. Semantic tokens replace every stock zinc-*
+     utility, so components carry no colour pairs and every neutral
      traces here. Hue 286 matches the seat/felt family. */
   --surface: #ffffff;
   --surface-2: #f4f4f5;
@@ -72,20 +80,19 @@
   --card-back-edge: #64748b;
 
   /* State.
-     --accent is a BRIGHT fill, so it pairs with a dark on-colour, never
-     white: white on this yellow measures 2.14:1, well under the 4.5:1 floor.
-     --accent-text is the mid-lightness variant for accent-coloured text and
-     borders, which must work on both the light and dark page background. */
-  /* Accent = the brand blue, hue 266.1 — the diamonds family. It was amber
-     (Tailwind's stock hue in OKLCH clothing); an accent must trace to the
-     palette, and the yellow band is deliberately not in it. */
+     Accent is the brand blue, hue 266.1 — the diamonds family. It was amber
+     (Tailwind's stock hue wearing OKLCH syntax); an accent has to trace to
+     the palette, and the yellow band is deliberately not in it. White on it
+     measures 5.08:1. --accent-text carries the same value but is its own
+     token because it styles text and borders rather than fills, so it can be
+     retuned without moving the button colour. */
   --accent: #305dff;
   --accent-fg: #ffffff;
   --accent-text: #305dff;
-  /* State tokens are placed IN the palette, not inherited from Tailwind:
-     to-act shares the accent's hue (70.1) so the action glow and the accent
-     read as one family; hero shares the clubs hue (156.7); leader shares the
-     grade-D hue (55) for "currently winning" text on light cards. */
+  /* State tokens sit IN the palette rather than being inherited from
+     Tailwind: to-act shares the accent hue (266.1) so the action glow and the
+     accent read as one family; hero shares the clubs hue (156.7); leader
+     shares the grade-D hue (55) for "currently winning" text. */
   --to-act: #9ab6f8;
   --hero: #3bd388;
   --leader: #a95c1d;
@@ -133,54 +140,6 @@
     --to-act: oklch(0.78 0.1 266.1);
     --hero: oklch(0.77 0.166 156.7);
     --leader: oklch(0.555 0.124 55);
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-
-    --surface: #18181b;
-    --surface-2: #27272a;
-    --line: #27272a;
-    --line-2: #3f3f46;
-    --ink-2: #d4d4d8;
-    /* ink-3 must lighten in dark mode: L 0.552 measures 4.10:1 on the dark
-       page and 3.67:1 on dark surfaces — under the 4.5:1 floor for the small
-       text it styles. L 0.712 clears every dark context (6.9-7.7:1). */
-    --ink-3: #a1a1aa;
-    /* --edge holds in both modes. */
-
-    --good-bg: #143a2b;
-    --good-fg: #7fd7ac;
-    --bad-bg: #45191b;
-    --bad-fg: #f5a09a;
-
-    /* Blue text can't clear 4.5:1 on white AND near-black at one lightness;
-       dark mode gets the lighter step. */
-    --accent-text: #4372ff;
-  }
-
-  @supports (color: oklch(0 0 0)) {
-    :root {
-      --background: oklch(0.145 0 0);
-      --foreground: oklch(0.946 0 0);
-
-      --surface: oklch(0.21 0.006 285.9);
-      --surface-2: oklch(0.274 0.005 286);
-      --line: oklch(0.274 0.005 286);
-      --line-2: oklch(0.37 0.012 285.8);
-      --ink-2: oklch(0.871 0.005 286.3);
-      --ink-3: oklch(0.712 0.013 286.1);
-
-      --good-bg: oklch(0.32 0.06 156.7);
-      --good-fg: oklch(0.82 0.13 156.7);
-      --bad-bg: oklch(0.3 0.08 25);
-      --bad-fg: oklch(0.78 0.11 25);
-
-      --accent-text: oklch(0.6 0.217 266.1);
-    }
   }
 }
 

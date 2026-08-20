@@ -212,11 +212,22 @@ leader shares the grade-D hue (55).
   coloured fill (suit cards, grade pills, seat pills). Anything sitting on
   the page background has to use `foreground`, or it breaks in one theme.
 
-### Dark mode block: intentional
+### Light only
 
-The `@media (prefers-color-scheme: dark)` background/foreground switch is
-deliberate: the site follows the OS theme and there is no in-app toggle. If a
-toggle ever lands, that block becomes the default the toggle overrides.
+The `@media (prefers-color-scheme: dark)` block was removed — the product
+ships one palette. `:root` declares `color-scheme: light` so a visitor whose
+OS is in dark mode doesn't get browser-styled dark form controls and
+scrollbars against a light page.
+
+Removing it was a CSS-only change: components carry zero `dark:` utilities,
+because the neutrals were already semantic tokens. Thirteen tokens that used
+to flip now resolve to their light values, and every pair that depended on
+the dark palette was re-measured: secondary text 4.83:1, accent text 5.08:1,
+verdict pills 6.13:1 and 5.67:1, seat-pill text 6.91:1.
+
+Note the table deliberately keeps fixed-dark seat pills on a light felt.
+Those use fixed tokens (`--seat`, `--edge`), not `surface`/`foreground`, so
+they were never theme-dependent and still read correctly.
 
 Grades A–F sweep hue 155° → 25° at constant L and chroma %, measuring
 5.20–6.08:1 on white text — one graduated ramp rather than five unrelated
